@@ -378,15 +378,30 @@ textarea {
 .log-item {
   background: white;
   border-radius: 14px;
-  padding: 16px;
+  padding: 12px;
   margin-bottom: 10px;
   border: 1px solid rgba(45, 90, 61, 0.08);
   box-shadow: 0 1px 8px var(--shadow);
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  align-items: center;
+  /* Align everything vertically center */
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  /* Whole item is clickable */
+  transition: all 0.2s;
+}
+
+.log-item:hover {
+  box-shadow: 0 4px 12px var(--shadow);
+  transform: translateY(-1px);
+}
+
+.log-item.selected {
+  background: #f0faf4;
+  /* Light green/forest tint */
+  border-color: var(--forest);
 }
 
 .log-item::before {
@@ -395,17 +410,13 @@ textarea {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 4px;
+  /* Slightly thicker */
 }
 
+/* Category Colors */
 .log-item.cat-訪問::before {
   background: #b8a0d8;
-}
-
-/* Corrected per prototype logic if mixed up, verify colors later. Wait, proto: 訪問=purple? let me check */
-/* Proto: 勉強会=green, 会議=blue, イベント=orange, 訪問=purple, 資料=yellow, 事務=pink, その他=gray */
-.log-item.cat-勉強会::before {
-  background: #7ab893;
 }
 
 .log-item.cat-会議::before {
@@ -414,10 +425,6 @@ textarea {
 
 .log-item.cat-イベント::before {
   background: #e8a87c;
-}
-
-.log-item.cat-訪問::before {
-  background: #b8a0d8;
 }
 
 .log-item.cat-資料作成::before {
@@ -432,210 +439,156 @@ textarea {
   background: #999;
 }
 
+.log-item.cat-勉強会::before {
+  background: #7ab893;
+}
+
+/* Left Column: Checkbox & Actions */
+.log-left-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 40px;
+  padding-left: 4px;
+}
+
+/* Square Checkbox */
+.sq-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.log-item.selected .sq-checkbox {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+/* Action Row (Edit/Cal) */
+.action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.icon-btn {
+  background: none;
+  border: 1px solid transparent;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #888;
+  text-decoration: none;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--forest);
+}
+
+/* Date Column */
 .log-date-col {
   text-align: center;
   min-width: 44px;
-  padding-top: 2px;
+  padding-top: 0;
+  /* Remove top padding */
 }
 
 .log-month {
-  font-size: 11px;
-  color: var(--moss);
+  font-size: 10px;
+  color: #888;
   font-weight: 500;
-  line-height: 1.4;
-}
-
-.log-day {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--forest);
   line-height: 1.2;
 }
 
-.log-weekday {
-  font-size: 11px;
-  color: #999;
-  line-height: 1.4;
+.log-day {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--forest);
+  line-height: 1.1;
+  font-family: 'Shippori Mincho', serif;
 }
 
+.log-weekday {
+  font-size: 10px;
+  color: #999;
+  line-height: 1.2;
+}
+
+/* Body Layout */
 .log-body {
   flex: 1;
+  min-width: 0;
+  /* Prevents flex item from overflowing */
+}
+
+.log-row-header {
+  margin-bottom: 4px;
 }
 
 .log-cat-badge {
   display: inline-block;
   font-size: 10px;
   padding: 2px 8px;
-  border-radius: 20px;
+  border-radius: 12px;
   background: var(--mist);
-  color: var(--moss);
-  margin-bottom: 5px;
+  color: var(--forest);
+  font-weight: 600;
 }
 
 .log-content {
   font-size: 14px;
   line-height: 1.5;
   color: var(--ink);
+  word-break: break-all;
+  /* Prevent overflow */
 }
 
 .log-meta {
   font-size: 11px;
   color: #aaa;
-  margin-top: 5px;
-}
-
-.action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px;
-  line-height: 1;
-  font-size: 16px;
-  color: #aaa;
-}
-
-/* Monthly Styles */
-.month-header {
+  margin-top: 4px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.month-nav {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.month-nav-btn {
-  background: white;
-  border: 1px solid rgba(45, 90, 61, 0.2);
-  border-radius: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
-  color: var(--forest);
-}
-
-.month-label {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 18px;
-  color: var(--forest);
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.stat-card {
-  background: var(--sand);
-  border-radius: 12px;
-  padding: 14px 10px;
-  text-align: center;
-}
-
-.stat-num {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--forest);
-}
-
-.stat-label {
-  font-size: 10px;
-  color: #888;
-  margin-top: 2px;
-}
-
-.monthly-log-item {
-  display: flex;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(45, 90, 61, 0.08);
-  font-size: 13px;
-}
-
-.monthly-date {
-  color: var(--moss);
-  font-weight: 500;
-  min-width: 45px;
-}
-
-.monthly-content {
-  color: var(--ink);
-  flex: 1;
-}
-
-.export-area {
-  background: var(--sand);
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 14px;
-  font-size: 12px;
-  color: #666;
-  line-height: 1.8;
-  font-family: monospace;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-.gs-info {
-  background: linear-gradient(135deg, rgba(45, 90, 61, 0.06), rgba(168, 197, 218, 0.1));
-  border: 1px dashed rgba(45, 90, 61, 0.2);
-  border-radius: 12px;
-  padding: 16px;
-  font-size: 13px;
-  color: #666;
-  line-height: 1.7;
-}
-
-/* Filter Buttons */
-.filter-btn {
-  padding: 5px 12px;
-  border: 1.5px solid rgba(45, 90, 61, 0.2);
-  border-radius: 20px;
-  background: white;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 12px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.18s;
-  white-space: nowrap;
-}
-
-.filter-btn.active {
-  background: var(--forest);
-  border-color: var(--forest);
-  color: white;
-  font-weight: 500;
-}
-
-/* Desktop Layout */
+/* Desktop Layout Adjustments */
 @media (min-width: 768px) {
   .main {
     max-width: 1200px;
-    /* Reduced from 1400px */
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 24px;
+    padding: 24px 32px 60px;
+    /* Add bottom padding */
     align-items: start;
-    padding: 24px 32px 0;
-    /* Increased right padding from 24px to 32px */
   }
 
   .tab-nav {
     max-width: 1200px;
-    /* Match main container */
     margin: 0 auto;
     background: transparent;
     border-bottom: none;
     padding: 10px 0 0;
     justify-content: flex-end;
-    /* Align tabs to right */
     position: static;
-    /* Unstick on desktop to flow normally */
   }
 
   .tab-nav .tab-btn {
@@ -653,7 +606,6 @@ textarea {
     color: var(--forest);
   }
 
-  /* Hide "Record" tab button on desktop since it's always visible */
   .tab-btn[data-tab="record"] {
     display: none;
   }
@@ -665,17 +617,12 @@ textarea {
   .panel-record {
     position: sticky;
     top: 90px;
-    /* Below sticky header */
-    max-height: calc(100vh - 110px);
-    /* Fill viewport but leave space */
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
-    /* Scroll internally if content is too tall */
     padding-right: 4px;
-    /* Space for scrollbar */
   }
 
-  /* Add extra right padding to cards on desktop to prevent button cutoff */
   .card {
-    padding-right: 24px;
+    padding-right: 20px;
   }
 }

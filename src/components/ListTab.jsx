@@ -115,15 +115,14 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                 padding: '0 4px',
                 height: '32px'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                        type="checkbox"
-                        checked={isAllSelected}
-                        onChange={toggleSelectAll}
-                        id="select-all"
-                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                    />
-                    <label htmlFor="select-all" style={{ fontSize: '14px', cursor: 'pointer', userSelect: 'none' }}>
+                <div
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                    onClick={toggleSelectAll}
+                >
+                    <div className={`sq-checkbox ${isAllSelected ? 'checked' : ''}`}>
+                        {isAllSelected && '✓'}
+                    </div>
+                    <label style={{ fontSize: '14px', cursor: 'pointer', userSelect: 'none', color: '#666' }}>
                         すべて選択 ({filteredRecords.length})
                     </label>
                 </div>
@@ -174,45 +173,41 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                 <div
                                     key={r.id}
                                     className={`log-item cat-${r.category} ${isSelected ? 'selected' : ''}`}
-                                    style={{
-                                        position: 'relative',
-                                        paddingLeft: '40px',
-                                        background: isSelected ? '#eff6ff' : undefined,
-                                        borderColor: isSelected ? '#3b82f6' : undefined
-                                    }}
+                                    onClick={() => toggleSelect(r.id)} // Allow clicking anywhere to toggle
                                 >
-                                    <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={isSelected}
-                                            onChange={() => toggleSelect(r.id)}
-                                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                                        />
+                                    {/* Left Side: Checkbox & Actions */}
+                                    <div className="log-left-col">
+                                        <div className={`sq-checkbox ${isSelected ? 'checked' : ''}`}>
+                                            {isSelected && '✓'}
+                                        </div>
+                                        <div className="action-row" onClick={(e) => e.stopPropagation()}>
+                                            <button className="icon-btn edit-btn" onClick={() => setEditingRecord(r)} title="編集">✏️</button>
+                                            <a
+                                                href={generateCalendarUrl(r)}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="icon-btn cal-btn"
+                                                title="Googleカレンダーに追加"
+                                            >
+                                                📅
+                                            </a>
+                                        </div>
                                     </div>
 
+                                    {/* Date Column */}
                                     <div className="log-date-col">
                                         <div className="log-month">{m}月</div>
                                         <div className="log-day">{day}日</div>
                                         <div className="log-weekday">（{wd}）</div>
                                     </div>
+
+                                    {/* Content Body */}
                                     <div className="log-body">
-                                        <span className="log-cat-badge">{CATEGORY_ICONS[r.category]} {r.category}</span>
+                                        <div className="log-row-header">
+                                            <span className="log-cat-badge">{CATEGORY_ICONS[r.category]} {r.category}</span>
+                                        </div>
                                         <div className="log-content">{r.content}</div>
                                         {meta && <div className="log-meta">{meta}</div>}
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
-                                        <a
-                                            href={generateCalendarUrl(r)}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="action-btn"
-                                            title="Googleカレンダーに追加"
-                                            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                        >
-                                            📅
-                                        </a>
-                                        <button className="action-btn" onClick={() => setEditingRecord(r)}>✏️</button>
-                                        <button className="action-btn" onClick={() => onDelete(r.id)}>✕</button>
                                     </div>
                                 </div>
                             );
