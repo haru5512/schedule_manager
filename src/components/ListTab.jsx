@@ -138,22 +138,22 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                 >
                                     {isAllSelected ? '解除' : '全選択'}
                                 </button>
-                                {selectedIds.size > 0 && (
-                                    <button
-                                        onClick={handleBulkDelete}
-                                        style={{
-                                            background: '#ef4444',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '4px',
-                                            padding: '4px 8px',
-                                            fontSize: '11px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        削除 ({selectedIds.size})
-                                    </button>
-                                )}
+                                <button
+                                    onClick={handleBulkDelete}
+                                    disabled={selectedIds.size === 0}
+                                    style={{
+                                        background: selectedIds.size > 0 ? '#ef4444' : '#e0e0e0',
+                                        color: selectedIds.size > 0 ? 'white' : '#aaa',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        padding: '4px 8px',
+                                        fontSize: '11px',
+                                        cursor: selectedIds.size > 0 ? 'pointer' : 'default',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    削除 ({selectedIds.size})
+                                </button>
                             </div>
                         </div>
 
