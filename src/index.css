@@ -678,16 +678,17 @@ textarea {
 
 /* Filter Buttons */
 .filter-btn {
-  padding: 5px 12px;
+  padding: 4px 10px;
   border: 1.5px solid rgba(45, 90, 61, 0.2);
   border-radius: 20px;
   background: white;
   font-family: 'Noto Sans JP', sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
   cursor: pointer;
   transition: all 0.18s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .filter-btn.active {
