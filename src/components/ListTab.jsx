@@ -173,7 +173,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                             const isSelected = selectedIds.has(r.id);
 
                             return (
-                                <div key={r.id} className={`log-item cat-${r.category} ${isSelected ? 'selected-item' : ''}`}>
+                                <div key={r.id} className={`log-item cat-${r.category} ${isSelected ? 'selected-item' : ''}`} style={{ opacity: r.excludeFromReport ? 0.6 : 1 }}>
                                     {/* Checkbox Column */}
                                     <div className="log-check-col">
                                         <div
@@ -195,6 +195,17 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                         {meta && <div className="log-meta">{meta}</div>}
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                                        <button
+                                            className="action-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onUpdate({ ...r, excludeFromReport: !r.excludeFromReport });
+                                            }}
+                                            title={r.excludeFromReport ? "月報に含める" : "月報から除外"}
+                                            style={{ opacity: r.excludeFromReport ? 1 : 0.3 }}
+                                        >
+                                            {r.excludeFromReport ? '🚫' : '👁️'}
+                                        </button>
                                         <a
                                             href={generateCalendarUrl(r)}
                                             target="_blank"

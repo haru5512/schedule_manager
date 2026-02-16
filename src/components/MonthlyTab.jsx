@@ -17,17 +17,21 @@ function MonthlyTab({ records }) {
         const m = currentMonth.getMonth() + 1;
 
         // Filter records for current month
-        const recs = records.filter(r => {
+        const allMonthRecs = records.filter(r => {
             const d = new Date(r.date);
             return d.getFullYear() === y && d.getMonth() + 1 === m;
         }).sort((a, b) => a.date > b.date ? 1 : -1);
 
-        // Stats
-        const days = new Set(recs.map(r => r.date)).size;
-        const events = recs.filter(r => ['イベント'].includes(r.category)).length;
-        const people = recs.reduce((sum, r) => sum + (r.count || 0), 0);
+        // Filter for specific uses
+        // reportRecs: used for Stats and Export Text (excludes 'excludeFromReport' items)
+        const reportRecs = allMonthRecs.filter(r => !r.excludeFromReport);
 
-        // Export Text (Full Month)
+        // Stats (using reportRecs)
+        const days = new Set(reportRecs.map(r => r.date)).size;
+        const events = reportRecs.filter(r => ['イベント'].includes(r.category)).length;
+        const people = reportRecs.reduce((sum, r) => sum + (r.count || 0), 0);
+
+        // Export Text (Full Month) - using reportRecs
         const daysInMonth = new Date(y, m, 0).getDate();
         const exportLines = [];
         const discordLines = [`**【${y}年${m}月 活動報告】**\n`];
@@ -38,8 +42,8 @@ function MonthlyTab({ records }) {
             const { m: mm, day: dd, wd: w } = formatDate(dateStr);
             const dateHeader = `${mm}/${dd}(${w})`;
 
-            // Find records for this day
-            const dayRecs = recs.filter(r => r.date === dateStr);
+            // Find records for this day (from reportRecs)
+            const dayRecs = reportRecs.filter(r => r.date === dateStr);
 
             // Generate content string
             let content = '';
@@ -52,32 +56,26 @@ function MonthlyTab({ records }) {
             }
 
             // 1. Daily Report Format (Content Only - Single Column)
-            // User pastes this into C9 (activity content column)
-            // Empty days output as blank lines to maintain alignment
             exportLines.push(content);
 
             // 2. Discord Format (Rich Text - All Days)
             discordLines.push(`**${dateHeader}**`);
             if (dayRecs.length > 0) {
                 dayRecs.forEach(r => {
-                    const icon = CATEGORY_ICONS[r.category] || '';
                     const parts = [r.content];
                     if (r.place) parts.push(`📍${r.place}`);
                     if (r.count) parts.push(`👥${r.count}名`);
                     if (r.note) parts.push(`(Note: ${r.note})`);
-
-                    // User asked to remove icons entirely
                     discordLines.push(`> ${parts.join(' ')}`);
                 });
             }
-            // Add empty line for separation
             discordLines.push('');
         }
 
         const text = exportLines.join('\n');
         const discord = discordLines.join('\n');
 
-        return { monthRecs: recs, stats: { days, events, people }, exportText: text, discordText: discord };
+        return { monthRecs: allMonthRecs, stats: { days, events, people }, exportText: text, discordText: discord };
     }, [records, currentMonth]);
 
     const copyToClipboard = (text, label) => {
@@ -176,7 +174,14 @@ function MonthlyTab({ records }) {
                                                 </div>
                                                 <div className="monthly-content" style={{ flex: 1 }}>
                                                     <span style={{ marginRight: '6px' }}>{CATEGORY_ICONS[r.category]}</span>
-                                                    <span style={{ fontWeight: '500', marginRight: '8px' }}>{r.content}</span>
+                                                    <span style={{
+                                                        fontWeight: '500',
+                                                        marginRight: '8px',
+                                                        textDecoration: r.excludeFromReport ? 'line-through' : 'none',
+                                                        color: r.excludeFromReport ? '#aaa' : 'inherit'
+                                                    }}>
+                                                        {r.content}
+                                                    </span>
                                                     <span style={{ fontSize: '12px', color: '#666' }}>
                                                         {[
                                                             r.place && `📍${r.place}`,

@@ -14,7 +14,8 @@ function EditModal({ record, isOpen, onClose, onSave }) {
                 content: record.content || '',
                 place: record.place || '',
                 count: record.count || '',
-                note: record.note || ''
+                note: record.note || '',
+                excludeFromReport: record.excludeFromReport || false
             });
         }
     }, [record]);
@@ -41,7 +42,8 @@ function EditModal({ record, isOpen, onClose, onSave }) {
             content: formData.content.trim(),
             place: formData.place.trim(),
             count: parseInt(formData.count) || 0,
-            note: formData.note.trim()
+            note: formData.note.trim(),
+            excludeFromReport: formData.excludeFromReport
         });
         onClose();
     };
@@ -106,6 +108,19 @@ function EditModal({ record, isOpen, onClose, onSave }) {
 
                 <label>メモ（任意）</label>
                 <input type="text" id="note" value={formData.note} onChange={handleChange} />
+
+                <div style={{ margin: '12px 0', padding: '10px', background: '#f9f9f9', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>
+                    <input
+                        type="checkbox"
+                        id="excludeFromReport"
+                        checked={formData.excludeFromReport || false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, excludeFromReport: e.target.checked }))}
+                        style={{ width: 'auto', margin: '0 8px 0 0' }}
+                    />
+                    <label htmlFor="excludeFromReport" style={{ margin: 0, color: '#666', fontWeight: 'normal', cursor: 'pointer' }}>
+                        この記録を月報（集計・出力）に含めない
+                    </label>
+                </div>
 
                 <button className="btn-primary" onClick={handleSubmit} style={{ marginTop: '6px' }}>変更を保存する</button>
             </div>
