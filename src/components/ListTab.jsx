@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDate, CATEGORY_ICONS, generateCalendarUrl } from '../utils';
 import EditModal from './EditModal';
 
@@ -8,6 +8,11 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [editingRecord, setEditingRecord] = useState(null);
     const [selectedIds, setSelectedIds] = useState(new Set());
+
+    // Clear selection when filters or search change to prevent accidental operations on hidden items
+    useEffect(() => {
+        setSelectedIds(new Set());
+    }, [filterCat, filterMonth, searchKeyword]);
 
     const toggleSelect = (id) => {
         const newSelected = new Set(selectedIds);
