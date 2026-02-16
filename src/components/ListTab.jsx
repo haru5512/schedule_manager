@@ -138,7 +138,8 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                         padding: '4px 8px',
                                         fontSize: '11px',
                                         cursor: 'pointer',
-                                        color: '#666'
+                                        color: '#666',
+                                        minWidth: '60px'
                                     }}
                                 >
                                     {isAllSelected ? '解除' : '全選択'}
