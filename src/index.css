@@ -709,14 +709,12 @@ textarea {
 /* Desktop Layout */
 @media (min-width: 768px) {
   .main {
-    max-width: 900px;
-    /* Reduced from 1200px to fit smaller desktop screens */
+    max-width: 1200px;
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 320px minmax(0, 1fr);
     gap: 24px;
     align-items: start;
-    padding: 24px 16px 0;
-    /* Reduced from 32px to 16px */
+    padding: 24px 32px 0;
     margin: 0 auto;
   }
 
@@ -725,16 +723,13 @@ textarea {
   }
 
   .tab-nav {
-    max-width: 900px;
-    /* Match main container */
+    max-width: 1200px;
     margin: 0 auto;
     background: transparent;
     border-bottom: none;
     padding: 10px 0 0;
     justify-content: flex-end;
-    /* Align tabs to right */
     position: static;
-    /* Unstick on desktop to flow normally */
   }
 
   .tab-nav .tab-btn {
