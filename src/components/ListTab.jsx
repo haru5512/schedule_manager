@@ -98,7 +98,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                         })}
                     </select>
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', maxWidth: '100%' }}>
                     {categories.map((cat) => (
                         <button
                             key={cat.label}
@@ -124,7 +124,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                     </div>
                 ) : (
                     <>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px', maxWidth: '100%', overflow: 'hidden' }}>
                             <div className="result-count" style={{ fontSize: '11px', color: '#aaa' }}>
                                 {filteredRecords.length}件
                             </div>
@@ -135,11 +135,11 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                         background: isAllSelected ? '#e0e0e0' : '#f5f5f5',
                                         border: '1px solid #ddd',
                                         borderRadius: '4px',
-                                        padding: '4px 8px',
-                                        fontSize: '11px',
+                                        padding: '3px 6px',
+                                        fontSize: '10px',
                                         cursor: 'pointer',
                                         color: '#666',
-                                        minWidth: '60px'
+                                        minWidth: '50px'
                                     }}
                                 >
                                     {isAllSelected ? '解除' : '全選択'}
@@ -152,8 +152,8 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                         color: selectedIds.size > 0 ? 'white' : '#aaa',
                                         border: 'none',
                                         borderRadius: '4px',
-                                        padding: '4px 8px',
-                                        fontSize: '11px',
+                                        padding: '3px 6px',
+                                        fontSize: '10px',
                                         cursor: selectedIds.size > 0 ? 'pointer' : 'default',
                                         transition: 'all 0.2s'
                                     }}

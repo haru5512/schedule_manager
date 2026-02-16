@@ -110,6 +110,8 @@ body::before {
 
 .page {
   animation: fadeIn 0.25s ease;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 @keyframes fadeIn {
