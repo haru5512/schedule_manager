@@ -377,11 +377,11 @@ textarea {
 /* Log List Styles */
 .log-item {
   background: white;
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 10px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
   border: 1px solid rgba(45, 90, 61, 0.08);
-  box-shadow: 0 1px 8px var(--shadow);
+  box-shadow: 0 1px 4px var(--shadow);
   display: flex;
   gap: 12px;
   align-items: flex-start;
@@ -400,14 +400,14 @@ textarea {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 8px;
 }
 
 .log-check-col {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 4px;
+  padding-top: 6px;
   /* Align with date top */
   min-width: 24px;
 }
