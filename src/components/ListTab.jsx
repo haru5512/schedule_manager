@@ -2,11 +2,36 @@ import { useState } from 'react';
 import { formatDate, CATEGORY_ICONS, generateCalendarUrl } from '../utils';
 import EditModal from './EditModal';
 
-function ListTab({ records, onUpdate, onDelete }) {
+function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
     const [filterCat, setFilterCat] = useState('');
     const [filterMonth, setFilterMonth] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [editingRecord, setEditingRecord] = useState(null);
+    const [selectedIds, setSelectedIds] = useState(new Set());
+
+    const toggleSelect = (id) => {
+        const newSelected = new Set(selectedIds);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedIds(newSelected);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === filteredRecords.length && filteredRecords.length > 0) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(filteredRecords.map(r => r.id)));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.size === 0) return;
+        onBulkDelete(Array.from(selectedIds));
+        setSelectedIds(new Set());
+    };
 
     const filteredRecords = records.filter(r => {
         const matchesCat = filterCat ? r.category === filterCat : true;
@@ -42,6 +67,8 @@ function ListTab({ records, onUpdate, onDelete }) {
         { name: '事務作業', label: '事務作業', icon: '🗂️' },
         { name: 'その他', label: 'その他', icon: '🌿' },
     ];
+
+    const isAllSelected = filteredRecords.length > 0 && selectedIds.size === filteredRecords.length;
 
     return (
         <div className="page active">
@@ -92,9 +119,44 @@ function ListTab({ records, onUpdate, onDelete }) {
                     </div>
                 ) : (
                     <>
-                        <div className="result-count" style={{ fontSize: '11px', color: '#aaa', textAlign: 'right', marginBottom: '8px', paddingRight: '2px' }}>
-                            {filteredRecords.length}件
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px' }}>
+                            <div className="result-count" style={{ fontSize: '11px', color: '#aaa' }}>
+                                {filteredRecords.length}件
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                    onClick={toggleSelectAll}
+                                    style={{
+                                        background: isAllSelected ? '#e0e0e0' : '#f5f5f5',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        padding: '4px 8px',
+                                        fontSize: '11px',
+                                        cursor: 'pointer',
+                                        color: '#666'
+                                    }}
+                                >
+                                    {isAllSelected ? '解除' : '全選択'}
+                                </button>
+                                {selectedIds.size > 0 && (
+                                    <button
+                                        onClick={handleBulkDelete}
+                                        style={{
+                                            background: '#ef4444',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            padding: '4px 8px',
+                                            fontSize: '11px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        削除 ({selectedIds.size})
+                                    </button>
+                                )}
+                            </div>
                         </div>
+
                         {filteredRecords.map((r) => {
                             const { m, day, wd } = formatDate(r.date);
                             const meta = [
@@ -103,8 +165,20 @@ function ListTab({ records, onUpdate, onDelete }) {
                                 r.note && `💬 ${r.note}`
                             ].filter(Boolean).join('　');
 
+                            const isSelected = selectedIds.has(r.id);
+
                             return (
-                                <div key={r.id} className={`log-item cat-${r.category}`}>
+                                <div key={r.id} className={`log-item cat-${r.category} ${isSelected ? 'selected-item' : ''}`}>
+                                    {/* Checkbox Column */}
+                                    <div className="log-check-col">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleSelect(r.id)}
+                                            style={{ margin: 0, width: '16px', height: '16px', cursor: 'pointer' }}
+                                        />
+                                    </div>
+
                                     <div className="log-date-col">
                                         <div className="log-month">{m}月</div>
                                         <div className="log-day">{day}日</div>

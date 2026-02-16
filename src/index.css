@@ -387,6 +387,11 @@ textarea {
   align-items: flex-start;
   position: relative;
   overflow: hidden;
+  transition: background-color 0.2s;
+}
+
+.log-item.selected-item {
+  background-color: #f0faf4;
 }
 
 .log-item::before {
@@ -396,6 +401,14 @@ textarea {
   top: 0;
   bottom: 0;
   width: 3px;
+}
+
+.log-check-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 4px;
+  /* Align with date top */
 }
 
 .log-item.cat-訪問::before {
