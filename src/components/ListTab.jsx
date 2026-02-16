@@ -216,8 +216,8 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                         >
                                             📅
                                         </a>
-                                        <button className="action-btn" onClick={() => setEditingRecord(r)}>✏️</button>
-                                        <button className="action-btn" onClick={() => onDelete(r.id)}>✕</button>
+                                        <button className="action-btn" onClick={() => setEditingRecord(r)} title="編集">✏️</button>
+                                        <button className="action-btn" onClick={() => onDelete(r.id)} title="削除">✕</button>
                                     </div>
                                 </div>
                             );
