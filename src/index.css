@@ -709,14 +709,15 @@ textarea {
 /* Desktop Layout */
 @media (min-width: 768px) {
   .main {
-    max-width: 1200px;
-    /* Reduced from 1400px */
+    max-width: 900px;
+    /* Reduced from 1200px to fit smaller desktop screens */
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 24px;
     align-items: start;
-    padding: 24px 32px 0;
-    /* Increased right padding from 24px to 32px */
+    padding: 24px 16px 0;
+    /* Reduced from 32px to 16px */
+    margin: 0 auto;
   }
 
   .page {
@@ -724,7 +725,7 @@ textarea {
   }
 
   .tab-nav {
-    max-width: 1200px;
+    max-width: 900px;
     /* Match main container */
     margin: 0 auto;
     background: transparent;
