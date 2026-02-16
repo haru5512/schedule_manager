@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { formatDate, CATEGORY_ICONS, generateCalendarUrl } from '../utils';
 import EditModal from './EditModal';
 
-function ListTab({ records, onUpdate, onDelete }) {
+function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
     const [filterCat, setFilterCat] = useState('');
     const [filterMonth, setFilterMonth] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [editingRecord, setEditingRecord] = useState(null);
+    const [selectedIds, setSelectedIds] = useState(new Set());
 
     const filteredRecords = records.filter(r => {
         const matchesCat = filterCat ? r.category === filterCat : true;
@@ -42,6 +43,32 @@ function ListTab({ records, onUpdate, onDelete }) {
         { name: '事務作業', label: '事務作業', icon: '🗂️' },
         { name: 'その他', label: 'その他', icon: '🌿' },
     ];
+
+    const toggleSelect = (id) => {
+        const newSelected = new Set(selectedIds);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedIds(newSelected);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === filteredRecords.length && filteredRecords.length > 0) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(filteredRecords.map(r => r.id)));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.size === 0) return;
+        onBulkDelete(Array.from(selectedIds));
+        setSelectedIds(new Set());
+    };
+
+    const isAllSelected = filteredRecords.length > 0 && selectedIds.size === filteredRecords.length;
 
     return (
         <div className="page active">
@@ -79,6 +106,48 @@ function ListTab({ records, onUpdate, onDelete }) {
                 </div>
             </div>
 
+            {/* Bulk Action Bar */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '10px',
+                padding: '0 4px',
+                height: '32px'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                        type="checkbox"
+                        checked={isAllSelected}
+                        onChange={toggleSelectAll}
+                        id="select-all"
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="select-all" style={{ fontSize: '14px', cursor: 'pointer', userSelect: 'none' }}>
+                        すべて選択 ({filteredRecords.length})
+                    </label>
+                </div>
+                {selectedIds.size > 0 && (
+                    <button
+                        onClick={handleBulkDelete}
+                        style={{
+                            background: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}
+                    >
+                        🗑️ {selectedIds.size}件削除
+                    </button>
+                )}
+            </div>
+
             <div>
                 {records.length === 0 ? (
                     <div className="empty-state" style={{ textAlign: 'center', padding: '50px 20px', color: '#bbb' }}>
@@ -92,9 +161,6 @@ function ListTab({ records, onUpdate, onDelete }) {
                     </div>
                 ) : (
                     <>
-                        <div className="result-count" style={{ fontSize: '11px', color: '#aaa', textAlign: 'right', marginBottom: '8px', paddingRight: '2px' }}>
-                            {filteredRecords.length}件
-                        </div>
                         {filteredRecords.map((r) => {
                             const { m, day, wd } = formatDate(r.date);
                             const meta = [
@@ -102,9 +168,28 @@ function ListTab({ records, onUpdate, onDelete }) {
                                 r.count && `👥 ${r.count}名`,
                                 r.note && `💬 ${r.note}`
                             ].filter(Boolean).join('　');
+                            const isSelected = selectedIds.has(r.id);
 
                             return (
-                                <div key={r.id} className={`log-item cat-${r.category}`}>
+                                <div
+                                    key={r.id}
+                                    className={`log-item cat-${r.category} ${isSelected ? 'selected' : ''}`}
+                                    style={{
+                                        position: 'relative',
+                                        paddingLeft: '40px',
+                                        background: isSelected ? '#eff6ff' : undefined,
+                                        borderColor: isSelected ? '#3b82f6' : undefined
+                                    }}
+                                >
+                                    <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleSelect(r.id)}
+                                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                        />
+                                    </div>
+
                                     <div className="log-date-col">
                                         <div className="log-month">{m}月</div>
                                         <div className="log-day">{day}日</div>

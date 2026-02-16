@@ -138,6 +138,11 @@ function App() {
     setRecords(records.filter(r => r.id !== id));
   };
 
+  const bulkDeleteRecords = (ids) => {
+    if (!window.confirm(`${ids.length}件の記録を削除しますか？`)) return;
+    setRecords(records.filter(r => !ids.includes(r.id)));
+  };
+
   const handleImportCompleted = () => {
     // Called when import is done in settings. Fetch fresh data.
     fetchFromGas();
@@ -216,6 +221,7 @@ function App() {
               records={records}
               onUpdate={updateRecord}
               onDelete={deleteRecord}
+              onBulkDelete={bulkDeleteRecords}
             />
           )}
           {activeTab === 'monthly' && (
