@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { toDateStr, toTimeStr } from '../utils';
+import { toDateStr, toTimeStr, generateCalendarUrl } from '../utils';
 
 function RecordTab({ onAdd }) {
     const [date, setDate] = useState('');
@@ -36,7 +36,17 @@ function RecordTab({ onAdd }) {
 
         onAdd(record);
         resetForm();
-        showToast('✅ 記録しました');
+
+        // Calendar Prompt
+        const calendarUrl = generateCalendarUrl(record);
+        // Use a slight delay to allow React to render/process, though not strictly necessary for alert
+        setTimeout(() => {
+            if (window.confirm('✅ 記録しました！\n📅 Googleカレンダーにも登録しますか？')) {
+                window.open(calendarUrl, '_blank');
+            } else {
+                showToast('✅ 記録しました');
+            }
+        }, 100);
     };
 
     const resetForm = () => {

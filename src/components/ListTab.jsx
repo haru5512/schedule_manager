@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatDate, CATEGORY_ICONS } from '../utils';
+import { formatDate, CATEGORY_ICONS, generateCalendarUrl } from '../utils';
 import EditModal from './EditModal';
 
 function ListTab({ records, onUpdate, onDelete }) {
@@ -87,6 +87,16 @@ function ListTab({ records, onUpdate, onDelete }) {
                                         {meta && <div className="log-meta">{meta}</div>}
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                                        <a
+                                            href={generateCalendarUrl(r)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="action-btn"
+                                            title="Googleカレンダーに追加"
+                                            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        >
+                                            📅
+                                        </a>
                                         <button className="action-btn" onClick={() => setEditingRecord(r)}>✏️</button>
                                         <button className="action-btn" onClick={() => onDelete(r.id)}>✕</button>
                                     </div>
