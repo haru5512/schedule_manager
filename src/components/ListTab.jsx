@@ -70,8 +70,53 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
 
     const isAllSelected = filteredRecords.length > 0 && selectedIds.size === filteredRecords.length;
 
+    // Scroll to Top Logic
+    const [showScrollBtn, setShowScrollBtn] = useState(false);
+    const [isScrolling, setIsScrolling] = useState(false);
+
+    // Use a ref to track scroll timeout
+    const scrollTimeoutRef = useState(null); // Actually we need useRef for logic in event listener, but simple state might work if attached to div scroll
+
+    // Better approach: attach scroll listener to the scrollable container (window or main div)
+    // Since layout might change on desktop/mobile, let's attach to window for simplicity or the specific container if known.
+    // In mobile, 'window' scrolls. In desktop '.panel-record' might scroll. 
+    // Let's use a useEffect to attach listener to window and also handle local component scrolling if needed.
+
+    // Correction: In index.css, body has overflow-x hidden but not y. So window scrolls on mobile.
+    // On desktop .panel-record has overflow-y auto.
+
+    // Let's simplify and use a fixed button that shows when > 300px. 
+    // "Disappear while scrolling" means we need to detect scroll events.
+
+    const handleScroll = () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        if (scrollTop > 300) {
+            setShowScrollBtn(true);
+        } else {
+            setShowScrollBtn(false);
+        }
+
+        // Fade out while scrolling
+        setIsScrolling(true);
+        clearTimeout(window.scrollTimeout);
+        window.scrollTimeout = setTimeout(() => {
+            setIsScrolling(false);
+        }, 150); // Show again 150ms after scroll stops
+    };
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Attach listener
+    // Note: React 18 strict mode might double invoke, but that's fine for listeners.
+    if (typeof window !== 'undefined') {
+        window.onscroll = handleScroll;
+    }
+
+
     return (
-        <div className="page active">
+        <div className="page active" style={{ paddingBottom: '60px' }}>
             <div className="card" style={{ padding: '14px 16px', marginBottom: '12px' }}>
                 <input
                     type="text"
@@ -161,7 +206,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                 ) : (
                     <>
                         {filteredRecords.map((r) => {
-                            const { m, day, wd } = formatDate(r.date);
+                            const { y, m, day, wd } = formatDate(r.date);
                             const meta = [
                                 r.place && `📍 ${r.place}`,
                                 r.count && `👥 ${r.count}名`,
@@ -175,39 +220,44 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                     className={`log-item cat-${r.category} ${isSelected ? 'selected' : ''}`}
                                     onClick={() => toggleSelect(r.id)} // Allow clicking anywhere to toggle
                                 >
-                                    {/* Left Side: Checkbox & Actions */}
+                                    {/* Left Side: Checkbox */}
                                     <div className="log-left-col">
                                         <div className={`sq-checkbox ${isSelected ? 'checked' : ''}`}>
                                             {isSelected && '✓'}
                                         </div>
-                                        <div className="action-row" onClick={(e) => e.stopPropagation()}>
-                                            <button className="icon-btn edit-btn" onClick={() => setEditingRecord(r)} title="編集">✏️</button>
-                                            <a
-                                                href={generateCalendarUrl(r)}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="icon-btn cal-btn"
-                                                title="Googleカレンダーに追加"
-                                            >
-                                                📅
-                                            </a>
+                                    </div>
+
+                                    {/* Center: Date & Content */}
+                                    <div className="log-center-col">
+                                        <div className="log-date-row">
+                                            <span className="log-year">{y}年</span>
+                                            <span className="log-month">{m}月</span>
+                                            <span className="log-day">{day}日</span>
+                                            <span className="log-weekday">（{wd}）</span>
+                                        </div>
+                                        <div className="log-body-content">
+                                            <div style={{ marginBottom: '4px' }}>
+                                                <span className="log-cat-badge">{CATEGORY_ICONS[r.category]} {r.category}</span>
+                                            </div>
+                                            <div className="log-content">{r.content}</div>
+                                            {meta && <div className="log-meta">{meta}</div>}
                                         </div>
                                     </div>
 
-                                    {/* Date Column */}
-                                    <div className="log-date-col">
-                                        <div className="log-month">{m}月</div>
-                                        <div className="log-day">{day}日</div>
-                                        <div className="log-weekday">（{wd}）</div>
-                                    </div>
-
-                                    {/* Content Body */}
-                                    <div className="log-body">
-                                        <div className="log-row-header">
-                                            <span className="log-cat-badge">{CATEGORY_ICONS[r.category]} {r.category}</span>
-                                        </div>
-                                        <div className="log-content">{r.content}</div>
-                                        {meta && <div className="log-meta">{meta}</div>}
+                                    {/* Right/Top: Actions */}
+                                    {/* Used absolute positioning for desktop/mobile consistency or flex */}
+                                    <div className="log-action-overlay" onClick={(e) => e.stopPropagation()}>
+                                        <button className="icon-btn edit-btn" onClick={() => setEditingRecord(r)} title="編集">✏️</button>
+                                        <a
+                                            href={generateCalendarUrl(r)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="icon-btn cal-btn"
+                                            title="Googleカレンダーに追加"
+                                        >
+                                            📅
+                                        </a>
+                                        <button className="icon-btn del-btn" onClick={() => onDelete(r.id)} title="削除">✕</button>
                                     </div>
                                 </div>
                             );
@@ -215,6 +265,14 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                     </>
                 )}
             </div>
+
+            {/* Scroll to Top Button */}
+            <button
+                className={`scroll-top-btn ${showScrollBtn ? 'show' : ''} ${isScrolling ? 'scrolling' : ''}`}
+                onClick={scrollToTop}
+            >
+                ⬆
+            </button>
 
             <EditModal
                 isOpen={!!editingRecord}

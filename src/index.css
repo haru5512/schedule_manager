@@ -378,19 +378,17 @@ textarea {
 .log-item {
   background: white;
   border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 10px;
+  padding: 12px 12px 12px 40px;
+  margin-bottom: 12px;
   border: 1px solid rgba(45, 90, 61, 0.08);
   box-shadow: 0 1px 8px var(--shadow);
   display: flex;
-  gap: 12px;
-  align-items: center;
-  /* Align everything vertically center */
+  flex-direction: column;
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  /* Whole item is clickable */
   transition: all 0.2s;
+  min-height: 80px;
 }
 
 .log-item:hover {
@@ -400,7 +398,6 @@ textarea {
 
 .log-item.selected {
   background: #f0faf4;
-  /* Light green/forest tint */
   border-color: var(--forest);
 }
 
@@ -411,7 +408,6 @@ textarea {
   top: 0;
   bottom: 0;
   width: 4px;
-  /* Slightly thicker */
 }
 
 /* Category Colors */
@@ -443,27 +439,29 @@ textarea {
   background: #7ab893;
 }
 
-/* Left Column: Checkbox & Actions */
+/* Left Column: Checkbox */
 .log-left-col {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  min-width: 40px;
-  padding-left: 4px;
+  justify-content: center;
+  z-index: 2;
 }
 
 /* Square Checkbox */
 .sq-checkbox {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border: 2px solid #ccc;
   border-radius: 4px;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   color: white;
   font-weight: bold;
   transition: all 0.2s;
@@ -474,72 +472,53 @@ textarea {
   border-color: var(--forest);
 }
 
-/* Action Row (Edit/Cal) */
-.action-row {
+/* Center Column: Date & Content */
+.log-center-col {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 }
 
-.icon-btn {
-  background: none;
-  border: 1px solid transparent;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+.log-date-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
+  align-items: baseline;
+  gap: 6px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  padding-right: 80px;
+}
+
+.log-year {
+  font-size: 11px;
   color: #888;
-  text-decoration: none;
-}
-
-.icon-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--forest);
-}
-
-/* Date Column */
-.log-date-col {
-  text-align: center;
-  min-width: 44px;
-  padding-top: 0;
-  /* Remove top padding */
+  font-weight: 500;
 }
 
 .log-month {
-  font-size: 10px;
-  color: #888;
-  font-weight: 500;
-  line-height: 1.2;
+  font-size: 16px;
+  color: var(--forest);
+  font-weight: 700;
+  font-family: 'Shippori Mincho', serif;
 }
 
 .log-day {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 18px;
   color: var(--forest);
-  line-height: 1.1;
+  font-weight: 700;
   font-family: 'Shippori Mincho', serif;
 }
 
 .log-weekday {
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
-  line-height: 1.2;
 }
 
-/* Body Layout */
-.log-body {
-  flex: 1;
-  min-width: 0;
-  /* Prevents flex item from overflowing */
-}
-
-.log-row-header {
-  margin-bottom: 4px;
+.log-body-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .log-cat-badge {
@@ -557,7 +536,6 @@ textarea {
   line-height: 1.5;
   color: var(--ink);
   word-break: break-all;
-  /* Prevent overflow */
 }
 
 .log-meta {
@@ -569,6 +547,83 @@ textarea {
   gap: 8px;
 }
 
+/* Action Overlay (Top Right) */
+.log-action-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  z-index: 3;
+}
+
+.icon-btn {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #666;
+  text-decoration: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn:hover {
+  background: var(--forest);
+  color: white;
+  border-color: var(--forest);
+}
+
+.del-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+/* Scroll to Top Button */
+.scroll-top-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: rgba(45, 90, 61, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scroll-top-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.scroll-top-btn.scrolling {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.scroll-top-btn:hover {
+  background: var(--forest);
+  transform: scale(1.1);
+}
+
 /* Desktop Layout Adjustments */
 @media (min-width: 768px) {
   .main {
@@ -577,12 +632,10 @@ textarea {
     grid-template-columns: 320px 1fr;
     gap: 24px;
     padding: 24px 32px 60px;
-    /* Add bottom padding */
     align-items: start;
   }
 
   .tab-nav {
-    max-width: 1200px;
     margin: 0 auto;
     background: transparent;
     border-bottom: none;
@@ -625,4 +678,12 @@ textarea {
   .card {
     padding-right: 20px;
   }
+
+  /* Scroll button position on desktop */
+  .scroll-top-btn {
+    bottom: 40px;
+    right: 40px;
+  }
 }
+
+```

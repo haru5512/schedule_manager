@@ -19,10 +19,11 @@ export function toTimeStr(d) {
 
 export function formatDate(dateStr) {
     const d = new Date(dateStr);
+    const y = d.getFullYear(); // Add year
     const m = d.getMonth() + 1;
     const day = d.getDate();
     const wd = WEEKDAYS[d.getDay()];
-    return { m, day, wd };
+    return { y, m, day, wd };
 }
 
 export function generateCalendarUrl(record) {
