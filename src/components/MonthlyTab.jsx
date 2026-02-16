@@ -202,9 +202,9 @@ function MonthlyTab({ records }) {
 
 
             <div className="card">
-                <div className="card-title" style={{ justifyContent: 'space-between' }}>
+                <div className="card-title">
                     <span>出力</span>
-                    <div className="toggle-group" style={{ display: 'flex', gap: '8px' }}>
+                    <div className="toggle-group" style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
                         <button
                             onClick={() => setPreviewMode('report')}
                             style={{
