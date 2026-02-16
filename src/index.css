@@ -727,7 +727,7 @@ textarea {
     margin: 0 auto;
     background: transparent;
     border-bottom: none;
-    padding: 10px 0 0;
+    padding: 10px 32px 0;
     justify-content: flex-end;
     position: static;
   }
