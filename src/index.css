@@ -378,27 +378,15 @@ textarea {
 .log-item {
   background: white;
   border-radius: 14px;
-  padding: 12px 12px 12px 40px;
-  margin-bottom: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
   border: 1px solid rgba(45, 90, 61, 0.08);
   box-shadow: 0 1px 8px var(--shadow);
   display: flex;
-  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
   position: relative;
   overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-height: 80px;
-}
-
-.log-item:hover {
-  box-shadow: 0 4px 12px var(--shadow);
-  transform: translateY(-1px);
-}
-
-.log-item.selected {
-  background: #f0faf4;
-  border-color: var(--forest);
 }
 
 .log-item::before {
@@ -407,12 +395,17 @@ textarea {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 3px;
 }
 
-/* Category Colors */
 .log-item.cat-訪問::before {
   background: #b8a0d8;
+}
+
+/* Corrected per prototype logic if mixed up, verify colors later. Wait, proto: 訪問=purple? let me check */
+/* Proto: 勉強会=green, 会議=blue, イベント=orange, 訪問=purple, 資料=yellow, 事務=pink, その他=gray */
+.log-item.cat-勉強会::before {
+  background: #7ab893;
 }
 
 .log-item.cat-会議::before {
@@ -421,6 +414,10 @@ textarea {
 
 .log-item.cat-イベント::before {
   background: #e8a87c;
+}
+
+.log-item.cat-訪問::before {
+  background: #b8a0d8;
 }
 
 .log-item.cat-資料作成::before {
@@ -435,213 +432,210 @@ textarea {
   background: #999;
 }
 
-.log-item.cat-勉強会::before {
-  background: #7ab893;
-}
-
-/* Left Column: Checkbox */
-.log-left-col {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-
-/* Square Checkbox */
-.sq-checkbox {
-  width: 22px;
-  height: 22px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  color: white;
-  font-weight: bold;
-  transition: all 0.2s;
-}
-
-.log-item.selected .sq-checkbox {
-  background: var(--forest);
-  border-color: var(--forest);
-}
-
-/* Center Column: Date & Content */
-.log-center-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-
-.log-date-row {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
-  padding-bottom: 6px;
-  margin-bottom: 4px;
-  padding-right: 80px;
-}
-
-.log-year {
-  font-size: 11px;
-  color: #888;
-  font-weight: 500;
+.log-date-col {
+  text-align: center;
+  min-width: 44px;
+  padding-top: 2px;
 }
 
 .log-month {
-  font-size: 16px;
-  color: var(--forest);
-  font-weight: 700;
-  font-family: 'Shippori Mincho', serif;
+  font-size: 11px;
+  color: var(--moss);
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .log-day {
-  font-size: 18px;
-  color: var(--forest);
+  font-size: 20px;
   font-weight: 700;
-  font-family: 'Shippori Mincho', serif;
+  color: var(--forest);
+  line-height: 1.2;
 }
 
 .log-weekday {
   font-size: 11px;
   color: #999;
+  line-height: 1.4;
 }
 
-.log-body-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.log-body {
+  flex: 1;
 }
 
 .log-cat-badge {
   display: inline-block;
   font-size: 10px;
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: 20px;
   background: var(--mist);
-  color: var(--forest);
-  font-weight: 600;
+  color: var(--moss);
+  margin-bottom: 5px;
 }
 
 .log-content {
   font-size: 14px;
   line-height: 1.5;
   color: var(--ink);
-  word-break: break-all;
 }
 
 .log-meta {
   font-size: 11px;
   color: #aaa;
-  margin-top: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  margin-top: 5px;
 }
 
-/* Action Overlay (Top Right) */
-.log-action-overlay {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 4px;
-  z-index: 3;
-}
-
-.icon-btn {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #666;
-  text-decoration: none;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.icon-btn:hover {
-  background: var(--forest);
-  color: white;
-  border-color: var(--forest);
-}
-
-.del-btn:hover {
-  background: #ef4444;
-  border-color: #ef4444;
-}
-
-/* Scroll to Top Button */
-.scroll-top-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background: rgba(45, 90, 61, 0.8);
-  color: white;
+.action-btn {
+  background: none;
   border: none;
-  border-radius: 50%;
-  font-size: 24px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  padding: 2px;
+  line-height: 1;
+  font-size: 16px;
+  color: #aaa;
+}
+
+/* Monthly Styles */
+.month-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
 }
 
-.scroll-top-btn.show {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.scroll-top-btn.scrolling {
-  opacity: 0.3;
-  pointer-events: none;
+.month-nav-btn {
+  background: white;
+  border: 1px solid rgba(45, 90, 61, 0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: var(--forest);
 }
 
-.scroll-top-btn:hover {
+.month-label {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  color: var(--forest);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stat-card {
+  background: var(--sand);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--forest);
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.monthly-log-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(45, 90, 61, 0.08);
+  font-size: 13px;
+}
+
+.monthly-date {
+  color: var(--moss);
+  font-weight: 500;
+  min-width: 45px;
+}
+
+.monthly-content {
+  color: var(--ink);
+  flex: 1;
+}
+
+.export-area {
+  background: var(--sand);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.8;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.gs-info {
+  background: linear-gradient(135deg, rgba(45, 90, 61, 0.06), rgba(168, 197, 218, 0.1));
+  border: 1px dashed rgba(45, 90, 61, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.7;
+}
+
+/* Filter Buttons */
+.filter-btn {
+  padding: 5px 12px;
+  border: 1.5px solid rgba(45, 90, 61, 0.2);
+  border-radius: 20px;
+  background: white;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.filter-btn.active {
   background: var(--forest);
-  transform: scale(1.1);
+  border-color: var(--forest);
+  color: white;
+  font-weight: 500;
 }
 
-/* Desktop Layout Adjustments */
+/* Desktop Layout */
 @media (min-width: 768px) {
   .main {
     max-width: 1200px;
+    /* Reduced from 1400px */
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 24px;
-    padding: 24px 32px 60px;
     align-items: start;
+    padding: 24px 32px 0;
+    /* Increased right padding from 24px to 32px */
   }
 
   .tab-nav {
+    max-width: 1200px;
+    /* Match main container */
     margin: 0 auto;
     background: transparent;
     border-bottom: none;
     padding: 10px 0 0;
     justify-content: flex-end;
+    /* Align tabs to right */
     position: static;
+    /* Unstick on desktop to flow normally */
   }
 
   .tab-nav .tab-btn {
@@ -659,6 +653,7 @@ textarea {
     color: var(--forest);
   }
 
+  /* Hide "Record" tab button on desktop since it's always visible */
   .tab-btn[data-tab="record"] {
     display: none;
   }
@@ -670,20 +665,17 @@ textarea {
   .panel-record {
     position: sticky;
     top: 90px;
-    max-height: calc(100vh - 120px);
+    /* Below sticky header */
+    max-height: calc(100vh - 110px);
+    /* Fill viewport but leave space */
     overflow-y: auto;
+    /* Scroll internally if content is too tall */
     padding-right: 4px;
+    /* Space for scrollbar */
   }
 
+  /* Add extra right padding to cards on desktop to prevent button cutoff */
   .card {
-    padding-right: 20px;
-  }
-
-  /* Scroll button position on desktop */
-  .scroll-top-btn {
-    bottom: 40px;
-    right: 40px;
+    padding-right: 24px;
   }
 }
-
-```
