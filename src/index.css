@@ -719,6 +719,10 @@ textarea {
     /* Increased right padding from 24px to 32px */
   }
 
+  .page {
+    min-width: 0;
+  }
+
   .tab-nav {
     max-width: 1200px;
     /* Match main container */
