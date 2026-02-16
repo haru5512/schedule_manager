@@ -3,6 +3,7 @@ import { WEEKDAYS } from './utils';
 import RecordTab from './components/RecordTab';
 import ListTab from './components/ListTab';
 import MonthlyTab from './components/MonthlyTab';
+import SettingsModal from './components/SettingsModal';
 
 function App() {
   const [activeTab, setActiveTab] = useState('record');
@@ -11,6 +12,9 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [headerDate, setHeaderDate] = useState('');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [gasUrl, setGasUrl] = useState(() => localStorage.getItem('gas_webapp_url') || '');
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     const now = new Date();
@@ -21,6 +25,61 @@ function App() {
   useEffect(() => {
     localStorage.setItem('activity_records', JSON.stringify(records));
   }, [records]);
+
+  // Sync to GAS when records change (Debounced to avoid too many requests)
+  useEffect(() => {
+    if (!gasUrl || records.length === 0) return;
+
+    const timer = setTimeout(() => {
+      syncToGas(records);
+    }, 2000); // 2 seconds debounce
+
+    return () => clearTimeout(timer);
+  }, [records, gasUrl]);
+
+  // Initial Fetch
+  useEffect(() => {
+    if (gasUrl) {
+      fetchFromGas();
+    }
+  }, [gasUrl]);
+
+  const syncToGas = async (currentRecords) => {
+    if (!gasUrl) return;
+    setIsSyncing(true);
+    try {
+      await fetch(gasUrl, {
+        method: 'POST',
+        mode: 'no-cors', // GAS Web App limitation with JSON
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentRecords)
+      });
+      // no-cors means we can't read response, but request is sent
+    } catch (e) {
+      console.error('Sync failed', e);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const fetchFromGas = async () => {
+    if (!gasUrl) return;
+    setIsSyncing(true);
+    try {
+      const res = await fetch(gasUrl);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(r => {
+          if (r.count) r.count = parseInt(r.count);
+        });
+        setRecords(data);
+      }
+    } catch (e) {
+      console.error('Fetch failed', e);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const addRecord = (record) => {
     const newRecords = [...records, record];
@@ -46,7 +105,16 @@ function App() {
           <div>
             <div className="app-title">🌱 活動記録</div>
           </div>
-          <div className="header-date">{headerDate}</div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {isSyncing && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.8)' }}>⟳ Sync...</span>}
+            <div className="header-date">{headerDate}</div>
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: 'rgba(255,255,255,0.8)', padding: 0 }}
+            >
+              ⚙️
+            </button>
+          </div>
         </div>
       </div>
 
@@ -86,6 +154,12 @@ function App() {
           <MonthlyTab records={records} />
         )}
       </div>
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSaveUrl={(url) => { setGasUrl(url); }}
+      />
     </>
   );
 }
