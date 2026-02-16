@@ -409,6 +409,29 @@ textarea {
   justify-content: center;
   padding-top: 4px;
   /* Align with date top */
+  min-width: 24px;
+}
+
+/* Square Checkbox */
+.sq-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #ccc;
+  border-radius: 2px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sq-checkbox.checked {
+  background: var(--forest);
+  border-color: var(--forest);
 }
 
 .log-item.cat-訪問::before {

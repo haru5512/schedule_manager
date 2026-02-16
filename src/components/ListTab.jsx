@@ -171,12 +171,12 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                 <div key={r.id} className={`log-item cat-${r.category} ${isSelected ? 'selected-item' : ''}`}>
                                     {/* Checkbox Column */}
                                     <div className="log-check-col">
-                                        <input
-                                            type="checkbox"
-                                            checked={isSelected}
-                                            onChange={() => toggleSelect(r.id)}
-                                            style={{ margin: 0, width: '16px', height: '16px', cursor: 'pointer' }}
-                                        />
+                                        <div
+                                            className={`sq-checkbox ${isSelected ? 'checked' : ''}`}
+                                            onClick={(e) => { e.stopPropagation(); toggleSelect(r.id); }}
+                                        >
+                                            {isSelected && '✓'}
+                                        </div>
                                     </div>
 
                                     <div className="log-date-col">
