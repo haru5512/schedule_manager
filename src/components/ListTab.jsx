@@ -77,7 +77,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
 
     return (
         <div className="page active">
-            <div className="card" style={{ padding: '14px 16px', marginBottom: '12px' }}>
+            <div className="card" style={{ marginBottom: '12px' }}>
                 <input
                     type="text"
                     placeholder="🔍 キーワードで検索"
