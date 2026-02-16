@@ -189,35 +189,53 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                         <div className="log-day">{day}日</div>
                                         <div className="log-weekday">（{wd}）</div>
                                     </div>
+
                                     <div className="log-body">
-                                        <span className="log-cat-badge">{CATEGORY_ICONS[r.category]} {r.category}</span>
-                                        <div className="log-content">{r.content}</div>
-                                        {meta && <div className="log-meta">{meta}</div>}
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                                        {/* Top Row: Badge & Content */}
+                                        <div className="log-top-row">
+                                            <div>
+                                                <span className="log-cat-badge">{CATEGORY_ICONS[r.category]} {r.category}</span>
+                                                <div className="log-content">{r.content}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Bottom Row: Actions & Meta */}
+                                        <div className="log-bottom-row">
+                                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                                <button
+                                                    className="action-btn"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onUpdate({ ...r, excludeFromReport: !r.excludeFromReport });
+                                                    }}
+                                                    title={r.excludeFromReport ? "月報に含める" : "月報から除外"}
+                                                    style={{ opacity: r.excludeFromReport ? 1 : 0.3 }}
+                                                >
+                                                    {r.excludeFromReport ? '🚫' : '👁️'}
+                                                </button>
+                                                <a
+                                                    href={generateCalendarUrl(r)}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="action-btn"
+                                                    title="Googleカレンダーに追加"
+                                                    style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                >
+                                                    📅
+                                                </a>
+                                                <button className="action-btn" onClick={(e) => { e.stopPropagation(); setEditingRecord(r); }} title="編集">✏️</button>
+                                            </div>
+                                            {meta && <div className="log-meta">{meta}</div>}
+                                        </div>
+
+                                        {/* Delete Button - Absolute positioned at top-right */}
                                         <button
-                                            className="action-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onUpdate({ ...r, excludeFromReport: !r.excludeFromReport });
-                                            }}
-                                            title={r.excludeFromReport ? "月報に含める" : "月報から除外"}
-                                            style={{ opacity: r.excludeFromReport ? 1 : 0.3 }}
+                                            className="action-btn delete-btn-abs"
+                                            onClick={(e) => { e.stopPropagation(); onDelete(r.id); }}
+                                            title="削除"
                                         >
-                                            {r.excludeFromReport ? '🚫' : '👁️'}
+                                            ✕
                                         </button>
-                                        <a
-                                            href={generateCalendarUrl(r)}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="action-btn"
-                                            title="Googleカレンダーに追加"
-                                            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                        >
-                                            📅
-                                        </a>
-                                        <button className="action-btn" onClick={() => setEditingRecord(r)} title="編集">✏️</button>
-                                        <button className="action-btn" onClick={() => onDelete(r.id)} title="削除">✕</button>
                                     </div>
                                 </div>
                             );
