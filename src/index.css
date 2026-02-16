@@ -132,7 +132,8 @@ body::before {
   margin-bottom: 14px;
   box-shadow: 0 2px 12px var(--shadow);
   border: 1px solid rgba(45, 90, 61, 0.06);
-  overflow-x: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .card-title {
@@ -679,17 +680,17 @@ textarea {
 
 /* Filter Buttons */
 .filter-btn {
-  padding: 4px 10px;
+  padding: 3px 8px;
   border: 1.5px solid rgba(45, 90, 61, 0.2);
   border-radius: 20px;
   background: white;
   font-family: 'Noto Sans JP', sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   color: #666;
   cursor: pointer;
   transition: all 0.18s;
   white-space: nowrap;
-  flex-shrink: 0;
+  flex-shrink: 1;
 }
 
 .filter-btn.active {
