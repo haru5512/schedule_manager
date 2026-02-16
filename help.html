@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Googleスプレッドシート連携 設定ガイド</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --forest: #2E5C55;
@@ -14,6 +16,7 @@
             --cream: #FDFBF7;
             --moss: #A3B18A;
         }
+
         body {
             font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             background-color: var(--cream);
@@ -22,14 +25,16 @@
             margin: 0;
             padding: 20px;
         }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 40px;
             border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
+
         h1 {
             font-family: 'Shippori Mincho', serif;
             color: var(--forest);
@@ -38,6 +43,7 @@
             padding-bottom: 20px;
             margin-bottom: 40px;
         }
+
         h2 {
             color: var(--soil);
             border-left: 5px solid var(--moss);
@@ -47,6 +53,7 @@
             padding: 10px 15px;
             border-radius: 0 8px 8px 0;
         }
+
         .step-num {
             display: inline-block;
             background: var(--forest);
@@ -59,12 +66,15 @@
             margin-right: 10px;
             font-size: 14px;
         }
+
         ol {
             padding-left: 20px;
         }
+
         li {
             margin-bottom: 10px;
         }
+
         pre {
             background: #2d2d2d;
             color: #ccc;
@@ -74,6 +84,7 @@
             font-family: Consolas, monospace;
             font-size: 13px;
         }
+
         .copy-btn {
             display: block;
             margin: 10px 0;
@@ -85,9 +96,11 @@
             cursor: pointer;
             font-size: 14px;
         }
+
         .copy-btn:hover {
             opacity: 0.9;
         }
+
         .warning {
             background: #fff5f5;
             border: 1px solid #ffcdd2;
@@ -97,6 +110,7 @@
             margin: 10px 0;
             font-weight: bold;
         }
+
         .back-link {
             display: block;
             text-align: center;
@@ -106,28 +120,29 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>🌱 Google連携 設定ガイド</h1>
-    <p>あなたの活動記録をGoogleスプレッドシートに保存するための設定手順です。<br>このページを見ながら、パソコンで設定を進めてください。</p>
+    <div class="container">
+        <h1>🌱 Google連携 設定ガイド</h1>
+        <p>あなたの活動記録をGoogleスプレッドシートに保存するための設定手順です。<br>このページを見ながら、パソコンで設定を進めてください。</p>
 
-    <h2>手順 1：スプレッドシートの準備</h2>
-    <ol>
-        <li>Googleドライブなどで、<strong>新しいスプレッドシート</strong>を作成します。</li>
-        <li>名前は何でもOKです（例：<code>活動記録DB</code>）。</li>
-        <li>メニューの <strong>「拡張機能」 ＞ 「Apps Script」</strong> をクリックします。<br>（別のタブでコード編集画面が開きます）</li>
-    </ol>
+        <h2>手順 1：スプレッドシートの準備</h2>
+        <ol>
+            <li>Googleドライブなどで、<strong>新しいスプレッドシート</strong>を作成します。</li>
+            <li>名前は何でもOKです（例：<code>活動記録DB</code>）。</li>
+            <li>メニューの <strong>「拡張機能」 ＞ 「Apps Script」</strong> をクリックします。<br>（別のタブでコード編集画面が開きます）</li>
+        </ol>
 
-    <h2>手順 2：コードのコピペ</h2>
-    <ol>
-        <li>開いた画面にあるコード（<code>function myFunction...</code>）をすべて消します。</li>
-        <li>以下のコードをすべてコピーして、貼り付けてください。</li>
-    </ol>
+        <h2>手順 2：コードのコピペ</h2>
+        <ol>
+            <li>開いた画面にあるコード（<code>function myFunction...</code>）をすべて消します。</li>
+            <li>以下のコードをすべてコピーして、貼り付けてください。</li>
+        </ol>
 
-    <button class="copy-btn" onclick="copyCode()">📋 コードをコピーする</button>
+        <button class="copy-btn" onclick="copyCode()">📋 コードをコピーする</button>
 
-    <pre id="gas-code">const SHEET_NAME = 'db';
+        <pre id="gas-code">const SHEET_NAME = 'db';
 
 function doGet(e) {
   const sheet = getSheet();
@@ -198,57 +213,61 @@ function formatTime(t) {
   return t ? (typeof t === 'string' ? t : Utilities.formatDate(t, Session.getScriptTimeZone(), 'HH:mm')) : '';
 }</pre>
 
-    <p>貼り付けたら、フロッピーディスクのアイコン💾（保存）を押して保存します。</p>
+        <p>貼り付けたら、フロッピーディスクのアイコン💾（保存）を押して保存します。</p>
 
-    <h2>手順 3：初期セットアップ</h2>
-    <ol>
-        <li>ツールバーの「デバッグ」の横にあるプルダウンから <strong>「setup」</strong> を選びます。</li>
-        <li><strong>実行ボタン ▶</strong> を押します。</li>
-        <li>「承認が必要です」と出たら：
-            <ul>
-                <li>「権限を確認」をクリック</li>
-                <li>自分のアカウントを選択</li>
-                <li>「このアプリはGoogleによって確認されていません」と出たら、左下の <strong>「詳細」</strong> を押し、一番下の <strong>「無題のプロジェクト（安全ではないページ）に移動」</strong> をクリック</li>
-                <li>「許可」をクリック</li>
-            </ul>
-        </li>
-        <li>画面下に「実行完了」と出ればOKです。</li>
-    </ol>
+        <h2>手順 3：初期セットアップ</h2>
+        <ol>
+            <li>ツールバーの「デバッグ」の横にあるプルダウンから <strong>「setup」</strong> を選びます。</li>
+            <li><strong>実行ボタン ▶</strong> を押します。</li>
+            <li>「承認が必要です」と出たら：
+                <ul>
+                    <li>「権限を確認」をクリック</li>
+                    <li>自分のアカウントを選択</li>
+                    <li>「このアプリはGoogleによって確認されていません」と出たら、左下の <strong>「詳細」</strong> を押し、一番下の
+                        <strong>「無題のプロジェクト（安全ではないページ）に移動」</strong> をクリック</li>
+                    <li>「許可」をクリック</li>
+                </ul>
+            </li>
+            <li>画面下に「実行完了」と出ればOKです。</li>
+        </ol>
 
-    <h2>手順 4：Webアプリとして公開（重要！）</h2>
-    <ol>
-        <li>右上の <strong>「デプロイ」 ＞ 「新しいデプロイ」</strong> をクリック。</li>
-        <li>左上の歯車アイコン⚙️ ＞ <strong>「ウェブアプリ」</strong> を選択。</li>
-        <li>以下の通りに設定してください（ここが間違えやすいです！）
-            <ul>
-                <li><strong>説明</strong>：<code>Schedule App</code> （何でもOK）</li>
-                <li><strong>次のユーザーとして実行</strong>：<strong>「自分 (Me)」</strong></li>
-                <li class="warning"><strong>アクセスできるユーザー</strong>：<strong>「全員 (Anyone)」</strong><br>※「Googleアカウントを持つ全員」ではありません！シンプルな「全員」を選んでください。</li>
-            </ul>
-        </li>
-        <li><strong>「デプロイ」</strong> をクリック。</li>
-        <li>発行された <strong>URLをコピー</strong> してください。</li>
-    </ol>
+        <h2>手順 4：Webアプリとして公開（重要！）</h2>
+        <ol>
+            <li>右上の <strong>「デプロイ」 ＞ 「新しいデプロイ」</strong> をクリック。</li>
+            <li>左上の歯車アイコン⚙️ ＞ <strong>「ウェブアプリ」</strong> を選択。</li>
+            <li>以下の通りに設定してください（ここが間違えやすいです！）
+                <ul>
+                    <li><strong>説明</strong>：<code>Schedule App</code> （何でもOK）</li>
+                    <li><strong>次のユーザーとして実行</strong>：<strong>「自分 (Me)」</strong></li>
+                    <li class="warning"><strong>アクセスできるユーザー</strong>：<strong>「全員
+                            (Anyone)」</strong><br>※「Googleアカウントを持つ全員」ではありません！シンプルな「全員」を選んでください。</li>
+                </ul>
+            </li>
+            <li><strong>「デプロイ」</strong> をクリック。</li>
+            <li>画面に表示される <strong>「ウェブアプリ」のURL</strong> （<code>https://script.google.com/...</code>
+                で始まるもの）をコピーしてください。<br>※「ライブラリのURL」ではありません！</li>
+        </ol>
 
-    <h2>手順 5：アプリに接続</h2>
-    <ol>
-        <li>アプリの設定画面に戻ります。</li>
-        <li>コピーしたURLを貼り付けて、「保存」を押してください。</li>
-    </ol>
+        <h2>手順 5：アプリに接続</h2>
+        <ol>
+            <li>アプリの設定画面に戻ります。</li>
+            <li>コピーしたURLを貼り付けて、「保存」を押してください。</li>
+        </ol>
 
-    <p style="text-align: center; margin-top: 40px;">これで設定は完了です！お疲れ様でした 🎉</p>
+        <p style="text-align: center; margin-top: 40px;">これで設定は完了です！お疲れ様でした 🎉</p>
 
-    <a href="javascript:window.close()" class="back-link">閉じる</a>
-</div>
+        <a href="javascript:window.close()" class="back-link">閉じる</a>
+    </div>
 
-<script>
-    function copyCode() {
-        const code = document.getElementById('gas-code').innerText;
-        navigator.clipboard.writeText(code).then(() => {
-            alert('コードをコピーしました！Scriptエディタに貼り付けてください。');
-        });
-    }
-</script>
+    <script>
+        function copyCode() {
+            const code = document.getElementById('gas-code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('コードをコピーしました！Scriptエディタに貼り付けてください。');
+            });
+        }
+    </script>
 
 </body>
+
 </html>
