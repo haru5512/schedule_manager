@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toDateStr, toTimeStr, generateCalendarUrl } from '../utils';
+import { SpeechRecognizer } from '../utils/speechRecognition';
+import { parseVoiceInput } from '../utils/geminiParser';
 
-function RecordTab({ onAdd }) {
+function RecordTab({ onAdd, gasUrl }) {
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [category, setCategory] = useState('');
@@ -10,11 +12,68 @@ function RecordTab({ onAdd }) {
     const [count, setCount] = useState('');
     const [note, setNote] = useState('');
     const [toastMsg, setToastMsg] = useState('');
+    const [isListening, setIsListening] = useState(false);
+    const [isParsing, setIsParsing] = useState(false);
+    const recognizerRef = useRef(null);
 
     useEffect(() => {
         const now = new Date();
         setDate(toDateStr(now));
         setTime(toTimeStr(now));
+
+        // Initialize speech recognizer
+        recognizerRef.current = new SpeechRecognizer();
+
+        recognizerRef.current.onStart(() => {
+            setIsListening(true);
+            showToast('🎤 聞いています...');
+        });
+
+        recognizerRef.current.onResult(async (transcript) => {
+            showToast(`認識: ${transcript}`);
+            setIsParsing(true);
+
+            try {
+                if (!gasUrl) {
+                    alert('GAS WebアプリのURLが設定されていません。\n設定画面で設定してください。');
+                    setIsParsing(false);
+                    return;
+                }
+
+                const parsed = await parseVoiceInput(transcript, gasUrl);
+
+                // Populate fields
+                if (parsed.date) setDate(parsed.date);
+                if (parsed.time) setTime(parsed.time);
+                if (parsed.category) setCategory(parsed.category);
+                if (parsed.content) setContent(parsed.content);
+                if (parsed.place) setPlace(parsed.place);
+                if (parsed.count) setCount(parsed.count.toString());
+                if (parsed.note) setNote(parsed.note);
+
+                showToast('✅ フィールドに入力しました');
+            } catch (error) {
+                alert(`解析エラー: ${error.message}`);
+            } finally {
+                setIsParsing(false);
+            }
+        });
+
+        recognizerRef.current.onError((errorMessage) => {
+            alert(errorMessage);
+            setIsListening(false);
+            setIsParsing(false);
+        });
+
+        recognizerRef.current.onEnd(() => {
+            setIsListening(false);
+        });
+
+        return () => {
+            if (recognizerRef.current) {
+                recognizerRef.current.stop();
+            }
+        };
     }, []);
 
     const handleSubmit = () => {
@@ -62,7 +121,25 @@ function RecordTab({ onAdd }) {
 
     const showToast = (msg) => {
         setToastMsg(msg);
-        setTimeout(() => setToastMsg(''), 2200);
+        setTimeout(() => setToastMsg(''), 2500);
+    };
+
+    const handleVoiceInput = () => {
+        if (isListening || isParsing) {
+            return;
+        }
+
+        if (!recognizerRef.current || !recognizerRef.current.supported) {
+            alert('このブラウザは音声入力に対応していません。\nChrome、Edge、Safariをお試しください。');
+            return;
+        }
+
+        if (!gasUrl) {
+            alert('GAS WebアプリのURLが設定されていません。\n設定画面で設定してください。');
+            return;
+        }
+
+        recognizerRef.current.start();
     };
 
     const categories = [
@@ -98,7 +175,18 @@ function RecordTab({ onAdd }) {
                     ))}
                 </div>
 
-                <label>活動内容</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label style={{ margin: 0 }}>活動内容</label>
+                    {/* <button
+                        type="button"
+                        className={`mic-btn ${isListening ? 'listening' : ''} ${isParsing ? 'parsing' : ''}`}
+                        onClick={handleVoiceInput}
+                        disabled={isListening || isParsing}
+                        title="音声入力"
+                    >
+                        {isParsing ? '⏳' : isListening ? '🔴' : '🎤'}
+                    </button> */}
+                </div>
                 <textarea
                     placeholder="例：地域住民との意見交換会に参加"
                     value={content}

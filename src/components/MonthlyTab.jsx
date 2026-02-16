@@ -4,6 +4,7 @@ import { formatDate, CATEGORY_ICONS } from '../utils';
 function MonthlyTab({ records }) {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [toastMsg, setToastMsg] = useState('');
+    const [previewMode, setPreviewMode] = useState('report'); // 'report' or 'discord'
 
     const changeMonth = (dir) => {
         const newDate = new Date(currentMonth);
@@ -11,7 +12,7 @@ function MonthlyTab({ records }) {
         setCurrentMonth(newDate);
     };
 
-    const { monthRecs, stats, exportText } = useMemo(() => {
+    const { monthRecs, stats, exportText, discordText } = useMemo(() => {
         const y = currentMonth.getFullYear();
         const m = currentMonth.getMonth() + 1;
 
@@ -26,40 +27,80 @@ function MonthlyTab({ records }) {
         const events = recs.filter(r => ['イベント'].includes(r.category)).length;
         const people = recs.reduce((sum, r) => sum + (r.count || 0), 0);
 
-        // Export Text
-        let text = '（記録がありません）';
-        if (recs.length > 0) {
-            const byDay = {};
-            recs.forEach(r => {
-                const { day, wd } = formatDate(r.date);
-                if (!byDay[day]) byDay[day] = { day, wd, items: [] };
-                let line = r.content;
-                if (r.place) line += `（${r.place}）`;
-                byDay[day].items.push(line);
-            });
-            text = Object.values(byDay).map(g =>
-                `${g.day}\t${g.wd}\t${g.items.join('　／　')}`
-            ).join('\n');
+        // Export Text (Full Month)
+        const daysInMonth = new Date(y, m, 0).getDate();
+        const exportLines = [];
+        const discordLines = [`**【${y}年${m}月 活動報告】**\n`];
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateObj = new Date(y, m - 1, d);
+            const dateStr = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const { m: mm, day: dd, wd: w } = formatDate(dateStr);
+            const dateHeader = `${mm}/${dd}(${w})`;
+
+            // Find records for this day
+            const dayRecs = recs.filter(r => r.date === dateStr);
+
+            // Generate content string
+            let content = '';
+            if (dayRecs.length > 0) {
+                content = dayRecs.map(r => {
+                    let line = r.content;
+                    if (r.place) line += `（${r.place}）`;
+                    return line;
+                }).join('、');
+            }
+
+            // 1. Daily Report Format (Content Only - Single Column)
+            // User pastes this into C9 (activity content column)
+            // Empty days output as blank lines to maintain alignment
+            exportLines.push(content);
+
+            // 2. Discord Format (Rich Text - All Days)
+            discordLines.push(`**${dateHeader}**`);
+            if (dayRecs.length > 0) {
+                dayRecs.forEach(r => {
+                    const icon = CATEGORY_ICONS[r.category] || '';
+                    const parts = [r.content];
+                    if (r.place) parts.push(`📍${r.place}`);
+                    if (r.count) parts.push(`👥${r.count}名`);
+                    if (r.note) parts.push(`(Note: ${r.note})`);
+
+                    // User asked to remove icons entirely
+                    discordLines.push(`> ${parts.join(' ')}`);
+                });
+            }
+            // Add empty line for separation
+            discordLines.push('');
         }
 
-        return { monthRecs: recs, stats: { days, events, people }, exportText: text };
+        const text = exportLines.join('\n');
+        const discord = discordLines.join('\n');
+
+        return { monthRecs: recs, stats: { days, events, people }, exportText: text, discordText: discord };
     }, [records, currentMonth]);
 
-    const copyExport = () => {
-        navigator.clipboard.writeText(exportText).then(() => {
-            setToastMsg('📋 コピーしました');
+    const copyToClipboard = (text, label) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setToastMsg(`📋 ${label}をコピーしました`);
             setTimeout(() => setToastMsg(''), 2000);
         }).catch(() => {
             // Fallback
             const ta = document.createElement('textarea');
-            ta.value = exportText;
+            ta.value = text;
             document.body.appendChild(ta);
             ta.select();
             document.execCommand('copy');
             document.body.removeChild(ta);
-            setToastMsg('📋 コピーしました');
+            setToastMsg(`📋 ${label}をコピーしました`);
             setTimeout(() => setToastMsg(''), 2000);
         });
+    };
+
+    const handleCopy = () => {
+        const text = previewMode === 'report' ? exportText : discordText;
+        const label = previewMode === 'report' ? '日報用テキスト' : 'Discord用テキスト';
+        copyToClipboard(text, label);
     };
 
     return (
@@ -98,26 +139,108 @@ function MonthlyTab({ records }) {
                         <div className="empty-text" style={{ color: '#ccc', textAlign: 'center' }}>この月の記録はありません</div>
                     </div>
                 ) : (
-                    monthRecs.map(r => {
-                        const { day, wd } = formatDate(r.date);
-                        return (
-                            <div key={r.id} className="monthly-log-item">
-                                <div className="monthly-date">{day}日（{wd}）</div>
-                                <div className="monthly-content">
-                                    {CATEGORY_ICONS[r.category]} {r.content}
-                                    {r.place ? ` ／${r.place}` : ''}
-                                    {r.count ? ` ／${r.count}名` : ''}
+                    (() => {
+                        // Group by date
+                        const grouped = {};
+                        monthRecs.forEach(r => {
+                            if (!grouped[r.date]) grouped[r.date] = [];
+                            grouped[r.date].push(r);
+                        });
+
+                        return Object.entries(grouped).map(([date, groupRecs]) => {
+                            const { day, wd } = formatDate(date);
+                            return (
+                                <div key={date} className="monthly-group" style={{ marginBottom: '16px' }}>
+                                    <div className="monthly-group-header" style={{
+                                        fontWeight: 'bold',
+                                        color: 'var(--forest)',
+                                        background: '#f4f7f6',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        marginBottom: '6px',
+                                        fontSize: '14px'
+                                    }}>
+                                        {day}日（{wd}）
+                                    </div>
+                                    <div className="monthly-group-items" style={{ paddingLeft: '8px' }}>
+                                        {groupRecs.map(r => (
+                                            <div key={r.id} className="monthly-log-item" style={{
+                                                display: 'flex',
+                                                padding: '6px 0',
+                                                borderBottom: '1px solid #eee',
+                                                fontSize: '14px',
+                                                alignItems: 'baseline'
+                                            }}>
+                                                <div style={{ width: '45px', fontSize: '11px', color: '#888', flexShrink: 0 }}>
+                                                    {r.time || '--:--'}
+                                                </div>
+                                                <div className="monthly-content" style={{ flex: 1 }}>
+                                                    <span style={{ marginRight: '6px' }}>{CATEGORY_ICONS[r.category]}</span>
+                                                    <span style={{ fontWeight: '500', marginRight: '8px' }}>{r.content}</span>
+                                                    <span style={{ fontSize: '12px', color: '#666' }}>
+                                                        {[
+                                                            r.place && `📍${r.place}`,
+                                                            r.count && `👥${r.count}名`
+                                                        ].filter(Boolean).join(' ')}
+                                                    </span>
+                                                    {r.note && <div style={{ fontSize: '11px', color: '#888', marginTop: '2px', paddingLeft: '22px' }}>Note: {r.note}</div>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })
+                            );
+                        });
+                    })()
                 )}
             </div>
 
+
             <div className="card">
-                <div className="card-title">コピー用テキスト</div>
-                <div className="export-area">{exportText}</div>
-                <button className="btn-secondary" onClick={copyExport} style={{ marginTop: '10px' }}>📋 コピーする</button>
+                <div className="card-title" style={{ justifyContent: 'space-between' }}>
+                    <span>出力</span>
+                    <div className="toggle-group" style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                            onClick={() => setPreviewMode('report')}
+                            style={{
+                                padding: '4px 8px',
+                                fontSize: '11px',
+                                borderRadius: '4px',
+                                border: '1px solid var(--forest)',
+                                background: previewMode === 'report' ? 'var(--forest)' : 'white',
+                                color: previewMode === 'report' ? 'white' : 'var(--forest)',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            報告書
+                        </button>
+                        <button
+                            onClick={() => setPreviewMode('discord')}
+                            style={{
+                                padding: '4px 8px',
+                                fontSize: '11px',
+                                borderRadius: '4px',
+                                border: '1px solid #5865F2',
+                                background: previewMode === 'discord' ? '#5865F2' : 'white',
+                                color: previewMode === 'discord' ? 'white' : '#5865F2',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Discord
+                        </button>
+                    </div>
+                </div>
+                <div className="export-area" style={{ maxHeight: '150px', overflowY: 'auto', fontSize: '12px' }}>
+                    {previewMode === 'report' ? exportText : discordText}
+                </div>
+                <button className="btn-secondary" onClick={handleCopy} style={{ marginTop: '10px', borderColor: previewMode === 'discord' ? '#5865F2' : '', color: previewMode === 'discord' ? '#5865F2' : '' }}>
+                    📋 {previewMode === 'report' ? '報告書用コピー' : 'Discord形式でコピー'}
+                </button>
+                {previewMode === 'report' && (
+                    <div style={{ marginTop: '8px', padding: '8px 12px', background: '#fff3cd', borderRadius: '8px', fontSize: '11px', color: '#856404', lineHeight: '1.5' }}>
+                        💡 <strong>報告書への貼り付け方：</strong>スプレッドシートの<strong>活動内容列の最初のセル</strong>（例：C9）を選択して貼り付けてください。日と曜日はそのまま残ります。
+                    </div>
+                )}
             </div>
 
             <div className={`toast ${toastMsg ? 'show' : ''}`} style={{ transform: toastMsg ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(80px)' }}>

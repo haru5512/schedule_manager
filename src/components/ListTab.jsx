@@ -4,18 +4,34 @@ import EditModal from './EditModal';
 
 function ListTab({ records, onUpdate, onDelete }) {
     const [filterCat, setFilterCat] = useState('');
+    const [filterMonth, setFilterMonth] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [editingRecord, setEditingRecord] = useState(null);
 
     const filteredRecords = records.filter(r => {
         const matchesCat = filterCat ? r.category === filterCat : true;
+        const matchesMonth = filterMonth ? r.date.startsWith(filterMonth) : true;
         const lowerKey = searchKeyword.toLowerCase();
         const matchesKey = !searchKeyword ||
             r.content.toLowerCase().includes(lowerKey) ||
             (r.place && r.place.toLowerCase().includes(lowerKey)) ||
             (r.note && r.note.toLowerCase().includes(lowerKey));
-        return matchesCat && matchesKey;
+        return matchesCat && matchesMonth && matchesKey;
     });
+
+    // Sort order: Oldest first (ASC) if currently filtering/searching, otherwise Newest first (DESC)
+    const isFiltering = Boolean(filterCat || filterMonth || searchKeyword);
+    filteredRecords.sort((a, b) => {
+        const dateA = (a.date || '') + (a.time || '');
+        const dateB = (b.date || '') + (b.time || '');
+        if (dateA < dateB) return isFiltering ? -1 : 1;
+        if (dateA > dateB) return isFiltering ? 1 : -1;
+        return 0;
+    });
+
+    // Extract unique months (YYYY-MM)
+    const availableMonths = [...new Set(records.map(r => r.date.substring(0, 7)))]
+        .sort((a, b) => b.localeCompare(a));
 
     const categories = [
         { name: '', label: 'すべて', icon: '' },
@@ -35,8 +51,21 @@ function ListTab({ records, onUpdate, onDelete }) {
                     placeholder="🔍 キーワードで検索"
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+                    style={{ marginBottom: '10px', width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                 />
+                <div style={{ marginBottom: '10px' }}>
+                    <select
+                        value={filterMonth}
+                        onChange={(e) => setFilterMonth(e.target.value)}
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', background: '#fff' }}
+                    >
+                        <option value="">📅 すべての期間</option>
+                        {availableMonths.map(m => {
+                            const [y, mon] = m.split('-');
+                            return <option key={m} value={m}>{y}年{parseInt(mon)}月</option>;
+                        })}
+                    </select>
+                </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {categories.map((cat) => (
                         <button

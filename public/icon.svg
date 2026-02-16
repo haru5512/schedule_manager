@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#FDFBF7" rx="100" ry="100"/>
+  <circle cx="256" cy="280" r="180" fill="#2E5C55" opacity="0.1"/>
+  <path d="M256 400C256 400 240 320 240 280C240 200 320 160 360 140C360 140 340 220 280 260C280 260 320 280 340 320" stroke="#2E5C55" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M256 400C256 400 272 320 272 280C272 200 192 160 152 140C152 140 172 220 232 260C232 260 192 280 172 320" stroke="#2E5C55" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M256 400V280" stroke="#2E5C55" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="256" cy="120" r="30" fill="#8B5E3C" opacity="0"/> 
+  <!-- Soil/Base -->
+  <path d="M200 400H312" stroke="#8B5E3C" stroke-width="24" stroke-linecap="round"/>
+</svg>
