@@ -165,29 +165,74 @@ function doGet(e) {
 
 function doPost(e) {
   const sheet = getSheet();
-  let records = [];
+  
   try {
-    // Check if contents exist
-    if (e.postData && e.postData.contents) {
-        records = JSON.parse(e.postData.contents);
+    const jsonString = e.postData.contents;
+    const data = JSON.parse(jsonString);
+
+    if (data.action === 'import') {
+        const count = importFromCalendar(data.startDate, data.endDate);
+        return ContentService.createTextOutput(JSON.stringify({ status: 'success', count: count }))
+            .setMimeType(ContentService.MimeType.JSON);
     }
+
+    let records = [];
+    if (Array.isArray(data)) {
+        records = data;
+    } else {
+        records = data.records || [];
+    }
+    
+    if (sheet.getLastRow() > 1) {
+        sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
+    }
+    
+    if (records.length > 0) {
+        const rows = records.map(r => [
+        r.id, r.date, r.time, r.category, r.content, r.place, r.count, r.note
+        ]);
+        sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success', count: records.length }))
+        .setMimeType(ContentService.MimeType.JSON);
+
   } catch (err) {
-    // If parsing fails, try to return error
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
-  
-  if (sheet.getLastRow() > 1) {
-    sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
-  }
-  
-  if (records.length > 0) {
-    const rows = records.map(r => [
-      r.id, r.date, r.time, r.category, r.content, r.place, r.count, r.note
-    ]);
-    sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
-    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function importFromCalendar(startStr, endStr) {
+    const sheet = getSheet();
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    end.setHours(23, 59, 59);
+
+    const events = CalendarApp.getDefaultCalendar().getEvents(start, end);
+    const newRows = [];
+
+    events.forEach(e => {
+        const d = e.getStartTime();
+        const date = Utilities.formatDate(d, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+        const time = e.isAllDayEvent() ? '' : Utilities.formatDate(d, Session.getScriptTimeZone(), 'HH:mm');
+        
+        newRows.push([
+            Utilities.getUuid(),
+            date,
+            time,
+            'その他',
+            e.getTitle(),
+            e.getLocation(),
+            '',
+            e.getDescription()
+        ]);
+    });
+
+    if (newRows.length > 0) {
+        sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, newRows[0].length).setValues(newRows);
+    }
+    return newRows.length;
 }
 
 function setup() {
@@ -215,7 +260,8 @@ function formatTime(t) {
 
         <p>貼り付けたら、フロッピーディスクのアイコン💾（保存）を押して保存します。</p>
 
-        <h2>手順 3：初期セットアップ</h2>
+        <h2>手順 3：初期セットアップ（重要）</h2>
+        <p>※ カレンダー機能を追加したため、<strong>もう一度この手順を行う必要があります。</strong></p>
         <ol>
             <li>ツールバーの「デバッグ」の横にあるプルダウンから <strong>「setup」</strong> を選びます。</li>
             <li><strong>実行ボタン ▶</strong> を押します。</li>
@@ -223,21 +269,20 @@ function formatTime(t) {
                 <ul>
                     <li>「権限を確認」をクリック</li>
                     <li>自分のアカウントを選択</li>
-                    <li>「このアプリはGoogleによって確認されていません」と出たら、左下の <strong>「詳細」</strong> を押し、一番下の
-                        <strong>「無題のプロジェクト（安全ではないページ）に移動」</strong> をクリック</li>
-                    <li>「許可」をクリック</li>
+                    <li><strong>「Google カレンダーへのアクセス」</strong> の許可を求めてくるので、「許可」をクリックします。</li>
                 </ul>
             </li>
             <li>画面下に「実行完了」と出ればOKです。</li>
         </ol>
 
-        <h2>手順 4：Webアプリとして公開（重要！）</h2>
+        <h2>手順 4：Webアプリとして公開（更新）</h2>
+        <p>※ コードを変更したら、必ず <strong>「デプロイの更新」ではなく「新しいデプロイ」</strong> を行ってください。</p>
         <ol>
             <li>右上の <strong>「デプロイ」 ＞ 「新しいデプロイ」</strong> をクリック。</li>
             <li>左上の歯車アイコン⚙️ ＞ <strong>「ウェブアプリ」</strong> を選択。</li>
             <li>以下の通りに設定してください（ここが間違えやすいです！）
                 <ul>
-                    <li><strong>説明</strong>：<code>Schedule App</code> （何でもOK）</li>
+                    <li><strong>説明</strong>：<code>Calendar Import Update</code> （何でもOK）</li>
                     <li><strong>次のユーザーとして実行</strong>：<strong>「自分 (Me)」</strong></li>
                     <li class="warning"><strong>アクセスできるユーザー</strong>：<strong>「全員
                             (Anyone)」</strong><br>※「Googleアカウントを持つ全員」ではありません！シンプルな「全員」を選んでください。</li>
@@ -252,6 +297,8 @@ function formatTime(t) {
         <ol>
             <li>アプリの設定画面に戻ります。</li>
             <li>コピーしたURLを貼り付けて、「保存」を押してください。</li>
+            <li>設定にある <strong>「📥 カレンダーから取り込み」</strong> 機能が使えるようになります！</li>
+            <li class="warning">※ <strong>2025年6月1日 ～ 今日</strong> の日付を指定して実行してください。</li>
         </ol>
 
         <p style="text-align: center; margin-top: 40px;">これで設定は完了です！お疲れ様でした 🎉</p>
