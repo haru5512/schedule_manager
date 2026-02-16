@@ -102,13 +102,13 @@ function App() {
           if (r.count) r.count = parseInt(r.count);
         });
         // Ensure fetched data is sorted (Newest first) to match App logic
-        data.sort((a, b) => {
+        fetchedRecords.sort((a, b) => {
           const dateA = (a.date || '') + (a.time || '');
           const dateB = (b.date || '') + (b.time || '');
           return dateA > dateB ? -1 : 1;
         });
 
-        setRecords(data);
+        setRecords(fetchedRecords);
         console.log('[GAS] Local records updated from SpreadSheet');
       } else {
         console.log('[GAS] No data in SpreadSheet or empty array');

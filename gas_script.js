@@ -20,7 +20,8 @@ function doGet(e) {
             content: row[4],
             place: row[5],
             count: row[6],
-            note: row[7]
+            note: row[7],
+            excludeFromReport: row[8] // Add new column
         };
     }).filter(r => r.id); // Filter empty rows
 
@@ -70,7 +71,7 @@ function doPost(e) {
 
         if (records.length > 0) {
             const rows = records.map(r => [
-                r.id, r.date, r.time, r.category, r.content, r.place, r.count, r.note
+                r.id, r.date, r.time, r.category, r.content, r.place, r.count, r.note, r.excludeFromReport || false
             ]);
             sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
         }
@@ -243,9 +244,9 @@ function setup() {
     if (!sheet) {
         sheet = ss.insertSheet(SHEET_NAME);
         // Add headers
-        sheet.appendRow(['id', 'date', 'time', 'category', 'content', 'place', 'count', 'note']);
+        sheet.appendRow(['id', 'date', 'time', 'category', 'content', 'place', 'count', 'note', 'excludeFromReport']);
         // Format headers
-        sheet.getRange(1, 1, 1, 8).setFontWeight('bold').setBackground('#f3f3f3');
+        sheet.getRange(1, 1, 1, 9).setFontWeight('bold').setBackground('#f3f3f3');
         sheet.setFrozenRows(1);
     }
 }
