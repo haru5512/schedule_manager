@@ -113,6 +113,11 @@ function App() {
       } else {
         console.log('[GAS] No data in SpreadSheet or empty array');
       }
+
+      // Save spreadsheet URL if available
+      if (data.spreadsheetUrl) {
+        localStorage.setItem('spreadsheet_url', data.spreadsheetUrl);
+      }
     } catch (e) {
       console.error('[GAS] Fetch failed:', e);
       // Don't alert on fetch fail to avoid annoying popup on load, just log

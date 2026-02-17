@@ -121,11 +121,13 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
         <div className="page active">
             <div className="card" style={{ marginBottom: '12px' }}>
                 <input
-                    type="text"
+                    type="search"
                     placeholder="🔍 キーワードで検索"
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
                     className="search-input"
+                    lang="ja"
+                    inputMode="search"
                 />
                 <div style={{ marginBottom: '10px' }}>
                     <select

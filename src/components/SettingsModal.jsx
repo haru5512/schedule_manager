@@ -41,18 +41,18 @@ function SettingsModal({ isOpen, onClose, onSaveUrl, onImportCompleted, gasUrl: 
 
                 <label>GAS WebアプリのURL</label>
                 <input
-                    type="text"
+                    type="url"
                     placeholder="https://script.google.com/macros/s/..."
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     style={{ marginBottom: '8px', width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    inputMode="url"
                 />
                 <div style={{ fontSize: '11px', color: '#888', marginBottom: '20px', lineHeight: '1.5' }}>
                     ※ GoogleスプレッドシートのGASスクリプトで設定してください。<br />
                     <a href="./help.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--forest)', textDecoration: 'underline' }}>
                         👉 詳しい設定手順はこちら（図解）
                     </a>
-
                 </div>
 
                 {url && (
@@ -63,7 +63,6 @@ function SettingsModal({ isOpen, onClose, onSaveUrl, onImportCompleted, gasUrl: 
                         >
                             {showQr ? 'QRコードを隠す' : '📲 スマホ連携用QRコードを表示'}
                         </button>
-
                         {showQr && (
                             <div style={{ marginTop: '15px', padding: '10px', background: '#fff', borderRadius: '8px' }}>
                                 <QRCodeCanvas value={magicLink} size={200} />
@@ -87,8 +86,23 @@ function SettingsModal({ isOpen, onClose, onSaveUrl, onImportCompleted, gasUrl: 
                             const spreadsheetUrl = localStorage.getItem('spreadsheet_url');
                             if (spreadsheetUrl) {
                                 window.open(spreadsheetUrl, '_blank');
+                            } else if (targetUrl) {
+                                // Fallback: fetch from GAS to get spreadsheet URL
+                                fetch(targetUrl)
+                                    .then(r => r.json())
+                                    .then(data => {
+                                        if (data.spreadsheetUrl) {
+                                            localStorage.setItem('spreadsheet_url', data.spreadsheetUrl);
+                                            window.open(data.spreadsheetUrl, '_blank');
+                                        } else {
+                                            alert('スプレッドシートURLを取得できませんでした。\nデータを一度読み込んでから再度お試しください。');
+                                        }
+                                    })
+                                    .catch(() => {
+                                        alert('通信エラーが発生しました。\nGAS URLが正しいか確認してください。');
+                                    });
                             } else {
-                                alert('スプレッドシートURLが取得できていません。\\nデータを一度読み込んでから再度お試しください。');
+                                alert('GAS WebアプリのURLを先に設定してください。');
                             }
                         }}
                         style={{ width: '100%', marginTop: '12px', fontSize: '13px' }}
@@ -104,13 +118,11 @@ function SettingsModal({ isOpen, onClose, onSaveUrl, onImportCompleted, gasUrl: 
                             Googleカレンダーの過去の予定を、このアプリに取り込みます。<br />
                             <span style={{ color: '#d32f2f' }}>※ 重複して取り込まれる可能性があります。</span>
                         </div>
-
                         <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                             <input type="date" id="importStart" defaultValue="2025-06-01" style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #ddd' }} />
                             <span style={{ alignSelf: 'center' }}>～</span>
                             <input type="date" id="importEnd" defaultValue={new Date().toISOString().split('T')[0]} style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #ddd' }} />
                         </div>
-
                         <button
                             className="btn-secondary"
                             style={{ width: '100%', fontSize: '13px' }}
