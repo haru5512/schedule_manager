@@ -191,6 +191,8 @@ function RecordTab({ onAdd, gasUrl }) {
                     placeholder="例：地域住民との意見交換会に参加"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
+                    lang="ja"
+                    inputMode="text"
                 ></textarea>
 
                 <div className="sub-row">
@@ -201,6 +203,8 @@ function RecordTab({ onAdd, gasUrl }) {
                             placeholder="例：町役場"
                             value={place}
                             onChange={(e) => setPlace(e.target.value)}
+                            lang="ja"
+                            inputMode="text"
                         />
                     </div>
                     <div>
@@ -220,6 +224,8 @@ function RecordTab({ onAdd, gasUrl }) {
                     type="text"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
+                    lang="ja"
+                    inputMode="text"
                 />
 
                 <button className="btn-primary" onClick={handleSubmit}>記録を保存する</button>

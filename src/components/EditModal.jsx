@@ -93,12 +93,12 @@ function EditModal({ record, isOpen, onClose, onSave }) {
                 </div>
 
                 <label>活動内容</label>
-                <textarea id="content" value={formData.content} onChange={handleChange} style={{ height: '80px' }}></textarea>
+                <textarea id="content" value={formData.content} onChange={handleChange} style={{ height: '80px' }} lang="ja" inputMode="text"></textarea>
 
                 <div className="sub-row">
                     <div>
                         <label>場所</label>
-                        <input type="text" id="place" value={formData.place} onChange={handleChange} />
+                        <input type="text" id="place" value={formData.place} onChange={handleChange} lang="ja" inputMode="text" />
                     </div>
                     <div>
                         <label>参加人数</label>
@@ -107,7 +107,7 @@ function EditModal({ record, isOpen, onClose, onSave }) {
                 </div>
 
                 <label>メモ（任意）</label>
-                <input type="text" id="note" value={formData.note} onChange={handleChange} />
+                <input type="text" id="note" value={formData.note} onChange={handleChange} lang="ja" inputMode="text" />
 
                 <div style={{ margin: '12px 0', padding: '10px', background: '#f9f9f9', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>
                     <input
