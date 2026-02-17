@@ -52,8 +52,7 @@ function SettingsModal({ isOpen, onClose, onSaveUrl, onImportCompleted, gasUrl: 
                     <a href="./help.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--forest)', textDecoration: 'underline' }}>
                         👉 詳しい設定手順はこちら（図解）
                     </a>
-                    <br />
-                    音声入力用に、GASのスクリプトプロパティで <code>GEMINI_API_KEY</code> を設定してください。
+
                 </div>
 
                 {url && (
