@@ -70,8 +70,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
     });
 
     // Pagination Logic
-    const isAllPeriods = filterMonth === '';
-    const displayedRecords = isAllPeriods ? filteredRecords.slice(0, visibleCount) : filteredRecords;
+    const displayedRecords = filteredRecords.slice(0, visibleCount);
 
     // Extract unique months (YYYY-MM) and ensure current month is available
     const rawMonths = [...new Set(records.map(r => r.date.substring(0, 7)))];
@@ -144,7 +143,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px', maxWidth: '100%', overflow: 'hidden' }}>
                             <div className="result-count" style={{ fontSize: '11px', color: '#aaa' }}>
                                 {filteredRecords.length}件
-                                {isAllPeriods && filteredRecords.length > displayedRecords.length && (
+                                {filteredRecords.length > displayedRecords.length && (
                                     <span style={{ marginLeft: '4px' }}>(表示中: {displayedRecords.length})</span>
                                 )}
                             </div>
@@ -263,7 +262,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                         })}
 
                         {/* Load More Button */}
-                        {isAllPeriods && filteredRecords.length > displayedRecords.length && (
+                        {filteredRecords.length > displayedRecords.length && (
                             <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
                                 <button
                                     onClick={() => setVisibleCount(prev => prev + 30)}
