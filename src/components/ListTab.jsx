@@ -91,6 +91,36 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
 
     const isAllSelected = displayedRecords.length > 0 && selectedIds.size === displayedRecords.length;
 
+    const scrollToToday = () => {
+        // Reset filters to default (Current Month)
+        setSearchKeyword('');
+        setFilterCat('');
+        setFilterMonth(currentMonthLink);
+
+        // Use timeout to allow render to complete after state change
+        setTimeout(() => {
+            const todayStr = current.getFullYear() + '-' + String(current.getMonth() + 1).padStart(2, '0') + '-' + String(current.getDate()).padStart(2, '0');
+            // Try to find exact date match
+            let target = document.querySelector(`.log-item[data-date="${todayStr}"]`);
+
+            // If not found, try to find the closest previous date (if today has no records)
+            // But user asked "scroll to today", implying it exists or just scroll to position.
+            // If strictly "today", we just try to find it.
+
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Highlight momentarily
+                target.style.transition = 'background 0.5s';
+                target.style.background = '#fff3cd';
+                setTimeout(() => {
+                    target.style.background = '';
+                }, 1500);
+            } else {
+                alert('本日の記録は見つかりませんでした');
+            }
+        }, 100);
+    };
+
     return (
         <div className="page active">
             <div className="card" style={{ marginBottom: '12px' }}>
@@ -114,7 +144,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                         })}
                     </select>
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', maxWidth: '100%' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', maxWidth: '100%', alignItems: 'center' }}>
                     {categories.map((cat) => (
                         <button
                             key={cat.label}
@@ -124,6 +154,25 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                             {cat.icon} {cat.label}
                         </button>
                     ))}
+                    <button
+                        onClick={scrollToToday}
+                        style={{
+                            marginLeft: 'auto',
+                            padding: '6px 12px',
+                            background: 'var(--forest)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '20px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                    >
+                        📍 本日
+                    </button>
                 </div>
             </div>
 
@@ -193,7 +242,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                             const isSelected = selectedIds.has(r.id);
 
                             return (
-                                <div key={r.id} className={`log-item cat-${r.category} ${isSelected ? 'selected-item' : ''}`} style={{ opacity: r.excludeFromReport ? 0.6 : 1 }}>
+                                <div key={r.id} data-date={r.date} className={`log-item cat-${r.category} ${isSelected ? 'selected-item' : ''}`} style={{ opacity: r.excludeFromReport ? 0.6 : 1 }}>
                                     {/* Checkbox Column */}
                                     <div className="log-check-col">
                                         <div
@@ -208,6 +257,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                         <div className="log-month">{m}月</div>
                                         <div className="log-day">{day}日</div>
                                         <div className="log-weekday">（{wd}）</div>
+                                        {r.time && <div className="log-time">{r.time}</div>}
                                     </div>
 
                                     <div className="log-body">
