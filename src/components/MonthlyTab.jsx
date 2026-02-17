@@ -63,10 +63,11 @@ function MonthlyTab({ records }) {
             if (dayRecs.length > 0) {
                 dayRecs.forEach(r => {
                     const parts = [r.content];
-                    if (r.place) parts.push(`📍${r.place}`);
+                    // User requested to remove Place and Time. Time was not here, Place is here.
+                    // if (r.place) parts.push(`📍${r.place}`);
                     if (r.count) parts.push(`👥${r.count}名`);
                     if (r.note) parts.push(`(Note: ${r.note})`);
-                    discordLines.push(`> ${parts.join(' ')}`);
+                    discordLines.push(`> ・${parts.join(' ')}`);
                 });
             }
             discordLines.push('');
