@@ -4,14 +4,23 @@ import EditModal from './EditModal';
 
 function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
     const [filterCat, setFilterCat] = useState('');
-    const [filterMonth, setFilterMonth] = useState('');
+
+    // Default to current month
+    const current = new Date();
+    const currentMonthLink = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
+    const [filterMonth, setFilterMonth] = useState(currentMonthLink);
+
     const [searchKeyword, setSearchKeyword] = useState('');
     const [editingRecord, setEditingRecord] = useState(null);
     const [selectedIds, setSelectedIds] = useState(new Set());
 
-    // Clear selection when filters or search change to prevent accidental operations on hidden items
+    // Pagination state for "All Periods"
+    const [visibleCount, setVisibleCount] = useState(30);
+
+    // Clear selection and reset pagination when filters or search change
     useEffect(() => {
         setSelectedIds(new Set());
+        setVisibleCount(30);
     }, [filterCat, filterMonth, searchKeyword]);
 
     const toggleSelect = (id) => {
@@ -25,10 +34,11 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
     };
 
     const toggleSelectAll = () => {
-        if (selectedIds.size === filteredRecords.length && filteredRecords.length > 0) {
+        // Use displayedRecords for selection to be intuitive
+        if (selectedIds.size === displayedRecords.length && displayedRecords.length > 0) {
             setSelectedIds(new Set());
         } else {
-            setSelectedIds(new Set(filteredRecords.map(r => r.id)));
+            setSelectedIds(new Set(displayedRecords.map(r => r.id)));
         }
     };
 
@@ -59,9 +69,16 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
         return 0;
     });
 
-    // Extract unique months (YYYY-MM)
-    const availableMonths = [...new Set(records.map(r => r.date.substring(0, 7)))]
-        .sort((a, b) => b.localeCompare(a));
+    // Pagination Logic
+    const isAllPeriods = filterMonth === '';
+    const displayedRecords = isAllPeriods ? filteredRecords.slice(0, visibleCount) : filteredRecords;
+
+    // Extract unique months (YYYY-MM) and ensure current month is available
+    const rawMonths = [...new Set(records.map(r => r.date.substring(0, 7)))];
+    if (currentMonthLink && !rawMonths.includes(currentMonthLink)) {
+        rawMonths.push(currentMonthLink);
+    }
+    const availableMonths = rawMonths.sort((a, b) => b.localeCompare(a));
 
     const categories = [
         { name: '', label: 'すべて', icon: '' },
@@ -73,7 +90,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
         { name: 'その他', label: 'その他', icon: '🌿' },
     ];
 
-    const isAllSelected = filteredRecords.length > 0 && selectedIds.size === filteredRecords.length;
+    const isAllSelected = displayedRecords.length > 0 && selectedIds.size === displayedRecords.length;
 
     return (
         <div className="page active">
@@ -127,6 +144,9 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px', maxWidth: '100%', overflow: 'hidden' }}>
                             <div className="result-count" style={{ fontSize: '11px', color: '#aaa' }}>
                                 {filteredRecords.length}件
+                                {isAllPeriods && filteredRecords.length > displayedRecords.length && (
+                                    <span style={{ marginLeft: '4px' }}>(表示中: {displayedRecords.length})</span>
+                                )}
                             </div>
                             <div style={{ display: 'flex', gap: '8px' }}>
                                 <button
@@ -163,7 +183,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                             </div>
                         </div>
 
-                        {filteredRecords.map((r) => {
+                        {displayedRecords.map((r) => {
                             const { m, day, wd } = formatDate(r.date);
                             const meta = [
                                 r.place && `📍 ${r.place}`,
@@ -241,6 +261,39 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                                 </div>
                             );
                         })}
+
+                        {/* Load More Button */}
+                        {isAllPeriods && filteredRecords.length > displayedRecords.length && (
+                            <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
+                                <button
+                                    onClick={() => setVisibleCount(prev => prev + 30)}
+                                    style={{
+                                        background: '#fff',
+                                        border: '1px solid #ddd',
+                                        padding: '10px 30px',
+                                        borderRadius: '20px',
+                                        fontSize: '13px',
+                                        color: '#666',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                                        transition: 'all 0.2s',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.currentTarget.style.background = '#f9f9f9';
+                                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.currentTarget.style.background = '#fff';
+                                        e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
+                                    }}
+                                >
+                                    <span>⬇️</span> もっと見る
+                                </button>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
