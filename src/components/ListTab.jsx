@@ -101,11 +101,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
         setTimeout(() => {
             const todayStr = current.getFullYear() + '-' + String(current.getMonth() + 1).padStart(2, '0') + '-' + String(current.getDate()).padStart(2, '0');
             // Try to find exact date match
-            let target = document.querySelector(`.log-item[data-date="${todayStr}"]`);
-
-            // If not found, try to find the closest previous date (if today has no records)
-            // But user asked "scroll to today", implying it exists or just scroll to position.
-            // If strictly "today", we just try to find it.
+            const target = document.querySelector(`.log-item[data-date="${todayStr}"]`);
 
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -129,13 +125,13 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                     placeholder="🔍 キーワードで検索"
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
-                    style={{ marginBottom: '10px', width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                    className="search-input"
                 />
                 <div style={{ marginBottom: '10px' }}>
                     <select
                         value={filterMonth}
                         onChange={(e) => setFilterMonth(e.target.value)}
-                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', background: '#fff' }}
+                        className="month-select"
                     >
                         <option value="">📅 すべての期間</option>
                         {availableMonths.map(m => {
@@ -154,23 +150,7 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                             {cat.icon} {cat.label}
                         </button>
                     ))}
-                    <button
-                        onClick={scrollToToday}
-                        style={{
-                            marginLeft: 'auto',
-                            padding: '6px 12px',
-                            background: 'var(--forest)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '20px',
-                            fontSize: '12px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                        }}
-                    >
+                    <button onClick={scrollToToday} className="today-btn">
                         📍 本日
                     </button>
                 </div>
@@ -189,41 +169,29 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
                     </div>
                 ) : (
                     <>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px', maxWidth: '100%', overflow: 'hidden' }}>
-                            <div className="result-count" style={{ fontSize: '11px', color: '#aaa' }}>
+                        <div className="result-header">
+                            <div className="result-count">
                                 {filteredRecords.length}件
                                 {filteredRecords.length > displayedRecords.length && (
                                     <span style={{ marginLeft: '4px' }}>(表示中: {displayedRecords.length})</span>
                                 )}
                             </div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                            <div className="bulk-actions">
                                 <button
                                     onClick={toggleSelectAll}
-                                    style={{
-                                        background: isAllSelected ? '#e0e0e0' : '#f5f5f5',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '4px',
-                                        padding: '3px 6px',
-                                        fontSize: '10px',
-                                        cursor: 'pointer',
-                                        color: '#666',
-                                        minWidth: '50px'
-                                    }}
+                                    className="bulk-select-btn"
+                                    style={{ background: isAllSelected ? '#e0e0e0' : '#f5f5f5' }}
                                 >
                                     {isAllSelected ? '解除' : '全選択'}
                                 </button>
                                 <button
                                     onClick={handleBulkDelete}
                                     disabled={selectedIds.size === 0}
+                                    className="bulk-delete-btn"
                                     style={{
                                         background: selectedIds.size > 0 ? '#ef4444' : '#e0e0e0',
                                         color: selectedIds.size > 0 ? 'white' : '#aaa',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        padding: '3px 6px',
-                                        fontSize: '10px',
                                         cursor: selectedIds.size > 0 ? 'pointer' : 'default',
-                                        transition: 'all 0.2s'
                                     }}
                                 >
                                     削除 ({selectedIds.size})
@@ -313,31 +281,10 @@ function ListTab({ records, onUpdate, onDelete, onBulkDelete }) {
 
                         {/* Load More Button */}
                         {filteredRecords.length > displayedRecords.length && (
-                            <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
+                            <div className="load-more-container">
                                 <button
                                     onClick={() => setVisibleCount(prev => prev + 30)}
-                                    style={{
-                                        background: '#fff',
-                                        border: '1px solid #ddd',
-                                        padding: '10px 30px',
-                                        borderRadius: '20px',
-                                        fontSize: '13px',
-                                        color: '#666',
-                                        cursor: 'pointer',
-                                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
-                                        transition: 'all 0.2s',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '6px'
-                                    }}
-                                    onMouseOver={(e) => {
-                                        e.currentTarget.style.background = '#f9f9f9';
-                                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        e.currentTarget.style.background = '#fff';
-                                        e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
-                                    }}
+                                    className="load-more-btn"
                                 >
                                     <span>⬇️</span> もっと見る
                                 </button>
