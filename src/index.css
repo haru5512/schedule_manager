@@ -471,26 +471,26 @@ textarea {
 
 .log-date-col {
   text-align: center;
-  min-width: 40px;
+  min-width: 44px;
   padding-top: 2px;
 }
 
 .log-month {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--moss);
   font-weight: 500;
   line-height: 1.2;
 }
 
 .log-day {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--forest);
   line-height: 1.1;
 }
 
 .log-weekday {
-  font-size: 10px;
+  font-size: 11px;
   color: #999;
   line-height: 1.2;
 }
